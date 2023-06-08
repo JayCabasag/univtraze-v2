@@ -112,7 +112,6 @@ const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 
 
 		setShowLoadingModal(false)
-		// console.log(proofDocUrl)
 		submitDataToDatabase(token, id, type, selectedDisease, proofDocUrl)
 
 	}

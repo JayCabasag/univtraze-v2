@@ -14,6 +14,7 @@ import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dimensions } from 'react-native';
 import { PRODUCTION_SERVER } from "../services/configs";
+import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
 
 const ResetPassword = ({ navigation, route: { params: { email, recovery_password } } }) => {
 
@@ -88,7 +89,7 @@ const ResetPassword = ({ navigation, route: { params: { email, recovery_password
 					alert("Password updated successfully.")
 				});
 		} catch (error) {
-			console.log(error)
+			alert(DEFAULT_ERROR_MESSAGE)
 			setError(true)
 			setSuccess(false)
 			setShowLoadingModal(false)

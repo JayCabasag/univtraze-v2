@@ -21,16 +21,13 @@ import { PRODUCTION_SERVER } from "../services/configs";
 
 const AccountSettings = ({ navigation, route: { params } }) => {
 
-
 	const toast = useToast()
 
 	const [showPasswordModal, setShowPasswordModal] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
-	const [loadingMessage, setLoadingMessage] = useState('')
 	const [password, setPassword] = useState('')
 	const [token, setToken] = useState(null)
 	const [userId, setUserId] = useState(null)
-	const [userType, setUserType] = useState('')
 
 	//Error handlers
 
@@ -110,7 +107,6 @@ const AccountSettings = ({ navigation, route: { params } }) => {
 	const decodeJwt = (currentToken) => {
 		var decodedToken = jwtDecode(currentToken);
 		setUserId(decodedToken.result.id)
-		setUserType(decodedToken.result.type || params.type)
 	};
 
 

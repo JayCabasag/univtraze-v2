@@ -15,6 +15,7 @@ import axios from "axios";
 import moment from "moment";
 import { DataTable } from 'react-native-paper';
 import { PRODUCTION_SERVER } from "../services/configs";
+import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
 
 const RoomVisited = ({ navigation, route: { params: { id, type } } }) => {
 
@@ -27,52 +28,34 @@ const RoomVisited = ({ navigation, route: { params: { id, type } } }) => {
 
 
 	async function getValueFor(key) {
-		let result = await SecureStore.getItemAsync(key);
-		if (result) {
-			handleGetUserVisitedRooms(id, type, result)
+		let token = await SecureStore.getItemAsync(key);
+		if (token) {
+			handleGetUserVisitedRooms(id, token)
 		} else {
 			alert("No values stored under that jwt-token.");
 		}
 	}
 
 
-	const handleGetUserVisitedRooms = async (uid, userType, currentToken) => {
+	const handleGetUserVisitedRooms = async (uid, currentToken) => {
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
 
-		const data = {
-			user_id: uid
-		}
-
-		await axios.post(`${PRODUCTION_SERVER}/rooms/userVisitedRooms`, data, config)
+		await axios.get(`${PRODUCTION_SERVER}/rooms/visited-rooms/${uid}`, config)
 			.then((response) => {
-
 				const success = response.data.success;
-
 				if (success === 0) {
-					return alert('An error has occured...');
+					return alert(DEFAULT_ERROR_MESSAGE);
 				}
 
 				if (success === 1) {
 					return setRoomVisited(response.data.data)
 				}
+			}).catch(() => {
+				alert(DEFAULT_ERROR_MESSAGE)
 			})
 	}
-
-	const [notificationCounts, setNotificationCounts] = useState(1);
-
-	const [visible, setVisible] = useState(false);
-	const [notifVisible, setNotifVisible] = useState(false);
-	const toggleBottomNavigationView = () => {
-		//Toggling the visibility state of the bottom sheet
-		setVisible(!visible);
-	};
-
-	const toggleNotifNavigationView = () => {
-		//Toggling the visibility state of the bottom sheet
-		setNotifVisible(!notifVisible);
-	};
 
 	const viewHistoryData = (room_id, building_name, room_number, date, time) => {
 

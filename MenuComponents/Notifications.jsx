@@ -6,10 +6,8 @@ import {
 	ScrollView
 } from "react-native";
 import { BottomSheet } from "react-native-btr";
-import React, { useState, useEffect } from "react";
-import { AntDesign } from '@expo/vector-icons';
+import React from "react";
 import moment from 'moment'
-import axios from "axios";
 
 const Notifications = ({ notifVisible, toggleNotifNavigationView, props: { userId, token, notificationLists } }) => {
 
@@ -27,13 +25,6 @@ const Notifications = ({ notifVisible, toggleNotifNavigationView, props: { userI
 					>
 						<Text style={{ fontSize: 28 }}>Notifications </Text>
 					</View>
-
-					{/* <View
-									style={{display: 'flex', flexDirection: 'row', justifyContent:'flex-end',width: '80%', alignSelf: 'center'}}
-								>
-									<AntDesign name="leftcircleo" size={24} color={offset === 0 ? "gray" : "black"} style={{marginRight: 10}} onPress={() => {handleGoBackPage()}}/>
-									<AntDesign name="rightcircleo" size={24} color="black" onPress={() => {handleNextPage()}}/>
-								</View> */}
 
 					<ScrollView
 						style={{
@@ -98,10 +89,6 @@ const Notifications = ({ notifVisible, toggleNotifNavigationView, props: { userI
 								:
 								null
 						}
-
-						{/* Profile updated notification */}
-
-						{/*Active cases  notification */}
 
 					</ScrollView>
 				</View>

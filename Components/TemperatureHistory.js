@@ -17,6 +17,7 @@ import axios from "axios";
 import { DataTable } from 'react-native-paper';
 import moment from "moment";
 import { PRODUCTION_SERVER } from "../services/configs";
+import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
 
 const TemperatureHistory = ({ navigation, route: { params: { id, type } } }) => {
 
@@ -53,24 +54,13 @@ const TemperatureHistory = ({ navigation, route: { params: { id, type } } }) => 
 	}
 
 	const handleGetUserTemperature = async (token, id) => {
-
 		setAllTemperatureHistory([])
-
-		let initialDateToday = new Date();
-		let finalDateToday = moment(initialDateToday).format('YYYY-MM-DD')
-
 		const config = {
 			headers: { Authorization: `Bearer ${token}` }
 		};
 
-		const data = {
-			user_id: id,
-			dateToday: finalDateToday
-		}
-
-		await axios.post(`${PRODUCTION_SERVER}/rooms/userTodaysTemperature`, data, config)
+		await axios.get(`${PRODUCTION_SERVER}/rooms/temperature-history/${id}`, config)
 			.then((response) => {
-
 				const success = response.data.success;
 				if (success === 0 && response.data.data === "Not set") {
 					return setCurrentUserTemperature('Not set');
@@ -93,6 +83,8 @@ const TemperatureHistory = ({ navigation, route: { params: { id, type } } }) => 
 					setCurrentUserTemperature(response.data.data.temperature)
 
 				}
+			}).catch(() => {
+				alert(DEFAULT_ERROR_MESSAGE)
 			})
 	}
 
@@ -106,19 +98,12 @@ const TemperatureHistory = ({ navigation, route: { params: { id, type } } }) => 
 			headers: { Authorization: `Bearer ${token}` }
 		};
 
-		const data = {
-			user_id: id,
-		}
-
-		await axios.post(`${PRODUCTION_SERVER}/rooms/userTemperatureHistory`, data, config)
+		await axios.get(`${PRODUCTION_SERVER}/rooms/temperature-history/${id}`, config)
 			.then((response) => {
-
-				const success = response.data.success;
-
 				const returnArray = response.data.data;
-
 				setAllTemperatureHistory(returnArray)
-
+			}).catch(() => {
+				alert(DEFAULT_ERROR_MESSAGE)
 			})
 	}
 

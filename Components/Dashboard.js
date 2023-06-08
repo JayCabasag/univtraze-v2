@@ -2,18 +2,14 @@ import {
 	StyleSheet,
 	Text,
 	View,
-	Modal,
-	Pressable,
 	ImageBackground,
-	Image,
 	TouchableOpacity,
 	ScrollView,
-	Picker,
 	Dimensions,
 	TouchableWithoutFeedback,
 	StatusBar,
 } from "react-native";
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { PieChart } from "react-native-chart-kit";
 import moment from "moment";
@@ -23,6 +19,7 @@ import Menu from "../MenuComponents/Menu";
 import Notifications from "../MenuComponents/Notifications";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PRODUCTION_SERVER } from "../services/configs";
+import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
 
 const Dashboard = ({ navigation, route }) => {
 
@@ -250,21 +247,20 @@ const Dashboard = ({ navigation, route }) => {
 
 	const handleGetNotifications = async (user_id, offset, token) => {
 		const config = {
-			headers: { Authorization: `Bearer ${token}` }
-		};
+			headers: { Authorization: `Bearer ${token}` },
+			params: { "start-at": offset }
+		}
 
-		const data = {
-			user_id: user_id,
-			start_at: offset
-		};
-		await axios.post(`${PRODUCTION_SERVER}/notifications/getUserNotificationsById`, data, config)
+		await axios.get(`${PRODUCTION_SERVER}/notifications/user-notifications/${user_id}`, config)
 			.then((response) => {
 				if (response.data.success === 0) {
-					return console.log(response.data)
+					return alert(DEFAULT_ERROR_MESSAGE)
 				}
 
 				let returnArray = response.data.results
 				return setNotificationLists(returnArray)
+			}).catch(() => {
+				alert(DEFAULT_ERROR_MESSAGE)
 			})
 	}
 

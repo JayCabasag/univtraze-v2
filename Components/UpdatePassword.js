@@ -17,11 +17,8 @@ import { PRODUCTION_SERVER } from "../services/configs";
 
 const UpdatePassword = ({ navigation, route }) => {
 
-	const toast = useToast()
-	// console.log(route.params.token)
-
-	const [token, setToken] = useState(route.params.token)
-	const [userId, setUserId] = useState(route.params.id)
+	const token = route.params.token
+	const userId = route.params.id
 	const [oldPassword, setOldPassword] = useState('')
 	const [newPassword, setNewPassword] = useState('')
 	const [confirmNewPassword, setConfirmNewPassword] = useState('')

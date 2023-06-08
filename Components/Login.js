@@ -15,30 +15,19 @@ import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PRODUCTION_SERVER } from "../services/configs";
+import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
 
 const windowWidth = Dimensions.get('screen').width;
-const windowHeight = Dimensions.get('screen').height;
-
 
 const Login = ({ navigation }) => {
 	const image = {
 		uri: "https://firebasestorage.googleapis.com/v0/b/tcuhub-cf9e1.appspot.com/o/images%2Flogin_image.png?alt=media&token=ebb53e48-2bc0-485d-8456-fe8a31683061",
 	};
-	const googleLogo = {
-		uri: "https://firebasestorage.googleapis.com/v0/b/tcuhub-cf9e1.appspot.com/o/images%2Fgoogle-icon3.png?alt=media&token=61a34454-dda9-4b6d-8dc6-198bb59ccbfb",
-	};
-	const facebookLogo = {
-		uri: "https://firebasestorage.googleapis.com/v0/b/tcuhub-cf9e1.appspot.com/o/images%2Ffacebook-icons.png?alt=media&token=0ec86a8b-f095-40dd-b4e9-4b31b2846068",
-	};
-
-	const val = useContext(AuthContext);
 
 	const [error, setError] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const [emailInput, setEmailInput] = useState("");
 	const [passwordInput, setPasswordInput] = useState("");
-
-
 
 	//Variables for loading
 
@@ -77,7 +66,6 @@ const Login = ({ navigation }) => {
 						.post(`${PRODUCTION_SERVER}/user/login`, data)
 						.then((response) => {
 							const success = response.data.success;
-							console.log(response)
 							if (success === 0) {
 								setError(true);
 								setErrorMessage(response.data.data);
@@ -89,8 +77,8 @@ const Login = ({ navigation }) => {
 								setPasswordInput("");
 								evaluateToken(response.data.token);
 							}
-						}).catch((error) => {
-							console.log(error)
+						}).catch(() => {
+							alert(DEFAULT_ERROR_MESSAGE)
 						}).finally(() => {
 							setShowLoadingModal(false)
 						})
@@ -182,18 +170,6 @@ const Login = ({ navigation }) => {
 						<Text style={styles.buttonText}>Log in</Text>
 					</TouchableOpacity>
 				</View>
-
-				{/* <Text style={styles.orText}>or</Text>
-
-			<View style={styles.socialMediaContainer}>
-				<TouchableOpacity onPress={() => {}}>
-					<Image style={styles.googleImage} source={googleLogo} />
-				</TouchableOpacity>
-
-				<TouchableOpacity onPress={() => {}}>
-					<Image style={styles.facebookImage} source={facebookLogo} />
-				</TouchableOpacity>
-			</View> */}
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 
@@ -246,7 +222,8 @@ const styles = StyleSheet.create({
 		paddingVertical: 1,
 		fontSize: 16,
 		color: "#4d7861",
-		backgroundColor: "#ffff",
+		backgroundColor: "#ffffff",
+		overflow: 'hidden'
 	},
 	button: {
 		backgroundColor: "#28CD41",

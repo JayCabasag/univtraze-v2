@@ -15,19 +15,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import { PRODUCTION_SERVER } from "../services/configs";
 import { AntDesign } from '@expo/vector-icons';
-import { useToast } from "react-native-toast-notifications";
 import * as ImagePicker from 'expo-image-picker';
 
 const UpdatePersonalInfo = ({ navigation, route }) => {
 
-	const toast = useToast()
-	// console.log(route.params.token)
-
-	const [token, setToken] = useState(route.params.token)
-	const [userId, setUserId] = useState(route.params.id)
-	const [userType, setUserType] = useState(route.params.type)
-
-	const [userData, setUserData] = useState(null)
+	const token = route.params.token
+	const userId = route.params.id
+	const userType = route.params.type
 
 	const [mobileNumber, setMobileNumber] = useState('')
 
@@ -83,12 +77,6 @@ const UpdatePersonalInfo = ({ navigation, route }) => {
 					setErrorMessage('')
 					setIsLoading(false)
 					setSuccess(false)
-
-					setUserData(response.data.data)
-
-					// This is where I assign all data from the database to the available fields. 
-
-					console.log(response.data)
 
 					if (response.data.data.profile_url !== undefined) {
 						setProfilePhoto({ uri: response.data.data.profile_url })
