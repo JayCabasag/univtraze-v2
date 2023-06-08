@@ -15,8 +15,8 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import jwtDecode from "jwt-decode";
-import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const SignUpCredentialsDocuments = ({ navigation, route }) => {
 

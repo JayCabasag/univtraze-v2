@@ -4,12 +4,9 @@ import {
 	Text,
 	View,
 	ImageBackground,
-	Pressable,
 	Image,
 	Modal,
-	TextInput,
 	ScrollView,
-	TouchableOpacity,
 	TouchableWithoutFeedback,
 	Alert,
 } from "react-native";
@@ -19,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import { DataTable } from 'react-native-paper';
 import moment from "moment";
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const TemperatureHistory = ({ navigation, route: { params: { id, type } } }) => {
 

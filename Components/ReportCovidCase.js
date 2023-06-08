@@ -4,23 +4,20 @@ import {
 	Text,
 	View,
 	ImageBackground,
-	Pressable,
 	Image,
 	Modal,
 	TextInput,
 	ScrollView,
 	TouchableOpacity,
 	TouchableWithoutFeedback,
-	Alert,
 } from "react-native";
-import { BottomSheet } from "react-native-btr";
 import { RadioButton } from "react-native-paper";
 import React, { useState, useEffect } from "react";
-import { borderColor } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 	// Notifications Variables

@@ -18,19 +18,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import DropDownPicker from "react-native-dropdown-picker"; menu_jpg
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const menu_jpg = {
 	uri: "https://firebasestorage.googleapis.com/v0/b/fir-phoneauth-74be7.appspot.com/o/menu.png?alt=media&token=e20ee94a-4632-467a-841c-c66659a2a3df",
-};
-
-
-const UselessTextInput = (props) => {
-	return (
-		<TextInput
-			{...props} // Inherit any props passed to it; e.g., multiline, numberOfLines below
-			editable
-		/>
-	);
 };
 
 const ReportEmergency = ({ navigation }) => {

@@ -4,26 +4,19 @@ import {
 	Text,
 	View,
 	ImageBackground,
-	Pressable,
 	Image,
-	Modal,
 	TextInput,
 	ScrollView,
 	TouchableOpacity,
 	TouchableWithoutFeedback,
-	Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
-import { DataTable } from 'react-native-paper';
-import moment from "moment";
-import jwtDecode from "jwt-decode";
+import { PRODUCTION_SERVER } from "../services/configs";
 import { AntDesign } from '@expo/vector-icons';
 import { useToast } from "react-native-toast-notifications";
 import * as ImagePicker from 'expo-image-picker';
-
 
 const UpdatePersonalInfo = ({ navigation, route }) => {
 

@@ -4,6 +4,7 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import base64 from "base-64"
 import axios from "axios";
 import moment from "moment";
+import { PRODUCTION_SERVER } from "../services/configs";
 
 export default function QrScanner({ navigation, route }) {
 

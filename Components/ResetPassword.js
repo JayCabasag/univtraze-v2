@@ -9,11 +9,11 @@ import {
 	StatusBar,
 	Modal
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as SecureStore from "expo-secure-store";
 import { Dimensions } from 'react-native';
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const ResetPassword = ({ navigation, route: { params: { email, recovery_password } } }) => {
 

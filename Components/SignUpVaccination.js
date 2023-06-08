@@ -16,12 +16,12 @@ import { Picker } from "@react-native-picker/picker";
 import React, { useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
-import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import { AntDesign } from "@expo/vector-icons";
 import jwtDecode from "jwt-decode";
 import axios from "axios"
+import { PRODUCTION_SERVER } from "../services/configs";
 
 //Import Library to make a cannon
 

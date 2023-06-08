@@ -18,11 +18,9 @@ import ModalSuccess from "react-native-modal";
 import * as SecureStore from "expo-secure-store";
 import jwtDecode from "jwt-decode";
 import { Dimensions } from 'react-native';
-
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const SignUp = ({ navigation }) => {
-	const windowWidth = Dimensions.get('window').width;
-	const windowHeight = Dimensions.get('window').height;
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");

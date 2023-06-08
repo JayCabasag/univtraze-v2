@@ -2,11 +2,11 @@ import {
 	StyleSheet,
 	Text,
 	View,
-	FlatList,
 	StatusBar,
 	TouchableWithoutFeedback,
 	ImageBackground,
-	ScrollView, Dimensions, Alert
+	ScrollView,
+	Alert
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +14,7 @@ import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import moment from "moment";
 import { DataTable } from 'react-native-paper';
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const RoomVisited = ({ navigation, route: { params: { id, type } } }) => {
 

@@ -12,11 +12,9 @@ import {
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ConfettiCannon from 'react-native-confetti-cannon';
-import ModalSuccess from "react-native-modal";
 import * as SecureStore from "expo-secure-store";
-import jwtDecode from "jwt-decode";
 import { Dimensions } from 'react-native';
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const ForgotPassword = ({ navigation }) => {
 

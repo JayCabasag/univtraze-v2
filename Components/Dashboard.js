@@ -22,6 +22,7 @@ import jwtDecode from "jwt-decode";
 import Menu from "../MenuComponents/Menu";
 import Notifications from "../MenuComponents/Notifications";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const Dashboard = ({ navigation, route }) => {
 
