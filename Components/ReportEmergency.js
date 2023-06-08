@@ -7,7 +7,6 @@ import {
 	Text,
 	View,
 	ImageBackground,
-	Pressable,
 	Image,
 	Modal,
 	TextInput,
@@ -17,33 +16,17 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
-import DropDownPicker from "react-native-dropdown-picker"; menu_jpg
 import { PRODUCTION_SERVER } from "../services/configs";
-import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
-
-const menu_jpg = {
-	uri: "https://firebasestorage.googleapis.com/v0/b/fir-phoneauth-74be7.appspot.com/o/menu.png?alt=media&token=e20ee94a-4632-467a-841c-c66659a2a3df",
-};
+import { DEFAULT_ERROR_MESSAGE, MedicalConditions } from "../utils/app_constants";
+import { Select, SelectItem } from '@ui-kitten/components'
 
 const ReportEmergency = ({ navigation }) => {
-
+	const [selectedIndex, setSelectedIndex] = useState([]);
+	const selectedMedicalConditionsValue = selectedIndex.map((index) => MedicalConditions[index - 1]).join(", ")
 	const [textArea, onChangeTextArea] = React.useState("");
-	const [open, setOpen] = useState(false);
-	const [value, setValue] = useState([]);
-	const [items, setItems] = useState([
-		{ label: "Fever", value: "Fever" },
-		{ label: "Cough or Colds", value: "Cough or Colds" },
-		{ label: "Sore throat", value: "Sore throat" },
-		{ label: "Loss of smell or taste", value: "Loss of smell or taste" },
-		{ label: "Body pains or fatigues", value: "Body pains or fatigues" },
-		{ label: "Diarrhea", value: "Diarrhea" },
-		{ label: "Breathing difficulties", value: "Breathing difficulties" },
-	]);
-
-
-	const [visible, setVisible] = useState(true);
-	const [notifVisible, setNotifVisible] = useState(false);
-
+	const [allRooms, setAllRooms] = useState([]);
+	const [selectedRoomIndex, setSelectedRoomIndex] = useState(0)
+	const selectedRoomValue = allRooms?.[selectedRoomIndex - 1]?.room_number ?? 'Select Room'
 
 	const [token, setToken] = useState('')
 	const [currentUserId, setCurrentUserId] = useState(null)
@@ -58,14 +41,34 @@ const ReportEmergency = ({ navigation }) => {
 	}, []);
 
 	async function getValueFor(key) {
-		let result = await SecureStore.getItemAsync(key);
-		if (result) {
-			setToken(result);
-			decodeJwt(result);
+		let token = await SecureStore.getItemAsync(key);
+		if (token) {
+			setToken(token);
+			decodeJwt(token);
+			getAllRooms(token)
 		} else {
 			alert("Invalid token, please re-login to continue.");
 			navigation.navigate('Login')
 		}
+	}
+
+	const getAllRooms = async (token) => {
+		const config = {
+			headers: { Authorization: `Bearer ${token}` }
+		}
+		await axios.get(`${PRODUCTION_SERVER}/rooms/allRooms`, config)
+			.then((response) => {
+				const success = response.data.success;
+				if (success === 0) {
+					return setAllRooms([])
+				}
+
+				if (success === 1) {
+					return setAllRooms(response?.data?.data ?? [])
+				}
+			}).catch((error) => {
+				alert(DEFAULT_ERROR_MESSAGE)
+			})
 	}
 
 	const decodeJwt = (currentToken) => {
@@ -82,34 +85,20 @@ const ReportEmergency = ({ navigation }) => {
 	// variables for user inputs
 
 	const [patientName, setPatientName] = useState('')
-	const [medicalCondition, setMedicalCondition] = useState([])
-	const [description, setDescription] = useState('')
 	const [roomNumber, setRoomNumber] = useState(0)
 
 	const [error, setError] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
 	const [success, setSuccess] = useState(false)
-	const [successMessage, setSuccessMessage] = useState('')
 	const [loading, setLoading] = useState(false)
 	//End of user input variables
-
-
-	const toggleBottomNavigationView = () => {
-		//Toggling the visibility state of the bottom sheet
-		setVisible(!visible);
-	};
-
-	const toggleNotifNavigationView = () => {
-		//Toggling the visibility state of the bottom sheet
-		setNotifVisible(!notifVisible);
-	};
 
 	const submitEmergencyReport = async () => {
 
 		const currentPatientName = patientName;
-		const currentMedicalCondition = value;
+		const currentMedicalCondition = selectedMedicalConditionsValue;
 		const currentConditionDescription = textArea;
-		const currentRoomNumber = roomNumber;
+		const currentRoomNumber = selectedRoomValue;
 
 		setLoading(true)
 
@@ -173,7 +162,7 @@ const ReportEmergency = ({ navigation }) => {
 			return
 		}
 
-		if (roomNumber <= 0) {
+		if (selectedRoomValue === 'Select Room') {
 			setLoading(false)
 			setError(true)
 			setErrorMessage('Please provide a valid room number')
@@ -317,29 +306,18 @@ const ReportEmergency = ({ navigation }) => {
 							/>
 
 							<Text style={{ marginTop: 20 }}>Medical condition</Text>
-							<DropDownPicker
-								open={open}
-								value={value}
-								items={items}
-								setOpen={setOpen}
-								setValue={setValue}
-								setItems={setItems}
-								theme="LIGHT"
-								multiple={true}
-								mode="BADGE"
-								listMode="SCROLLVIEW"
-								badgeDotColors={[
-									"#e76f51",
-									"#00b4d8",
-									"#e9c46a",
-									"##25cf41",
-									"#8ac926",
-									"#2536cf",
-									"#d11f99",
-								]}
-								style={{ borderColor: "#28CD4199" }}
-							/>
-
+							<Select
+								value={selectedMedicalConditionsValue}
+								multiSelect={true}
+								status="success"
+								style={styles.medicalConditionDropdown}
+								selectedIndex={selectedIndex}
+								onSelect={(index) => setSelectedIndex(index)}
+							>
+								{MedicalConditions.map((value, index) => {
+									return <SelectItem title={value} key={index} />
+								})}
+							</Select>
 							<Text style={{ marginTop: 20 }}>Description</Text>
 
 							<TextInput
@@ -352,12 +330,17 @@ const ReportEmergency = ({ navigation }) => {
 							/>
 
 							<Text style={{ marginTop: 20 }}>Room Number </Text>
-							<TextInput
-								style={styles.input}
-								onChangeText={(e) => { setRoomNumber(e) }}
-								value={roomNumber}
-								placeholder="e.g 401"
-							/>
+							<Select
+								value={selectedRoomValue}
+								status="success"
+								style={styles.medicalConditionDropdown}
+								selectedIndex={selectedRoomIndex}
+								onSelect={(index) => setSelectedRoomIndex(index)}
+							>
+								{allRooms.map((value, index) => {
+									return <SelectItem title={value.room_number} key={index} />
+								})}
+							</Select>
 							{
 								success ?
 									<Text
@@ -539,4 +522,8 @@ const styles = StyleSheet.create({
 		justifyContent: "flex-start",
 		textAlignVertical: "top",
 	},
+	medicalConditionDropdown: {
+		borderColor: "#28CD4199",
+		backgroundColor: "#GGGGGG",
+	}
 });

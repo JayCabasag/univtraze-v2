@@ -20,7 +20,6 @@ import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
 const RoomVisited = ({ navigation, route: { params: { id, type } } }) => {
 
 	const [roomVisited, setRoomVisited] = useState([]);
-	const [token, setToken] = useState(null)
 
 	useEffect(() => {
 		getValueFor("x-token");

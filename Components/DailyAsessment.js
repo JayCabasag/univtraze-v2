@@ -48,7 +48,6 @@ const DailyAsessment = () => {
 	const [visible, setVisible] = useState(false);
 	const [notifVisible, setNotifVisible] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [isChecked, setIsChecked] = useState(true);
 
 	const toggleBottomNavigationView = () => {
 		//Toggling the visibility state of the bottom sheet
