@@ -15,11 +15,11 @@ import axios from "axios";
 import moment from "moment";
 import { DataTable } from 'react-native-paper';
 
-const RoomVisited = ({ navigation, route: {params: {id, type}}}) => {
-	
+const RoomVisited = ({ navigation, route: { params: { id, type } } }) => {
+
 	const [roomVisited, setRoomVisited] = useState([]);
 	const [token, setToken] = useState(null)
-	
+
 	useEffect(() => {
 		getValueFor("x-token");
 	}, []);
@@ -39,24 +39,24 @@ const RoomVisited = ({ navigation, route: {params: {id, type}}}) => {
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
-		
+
 		const data = {
-			 user_id: uid
+			user_id: uid
 		}
 
-		await axios.post(`https://univtraze.herokuapp.com/api/rooms/userVisitedRooms`, data, config)
-		.then((response) => {
-		
-		const success = response.data.success;
-		
-		if(success === 0){
-			return alert('An error has occured...');
-		}
+		await axios.post(`${PRODUCTION_SERVER}/rooms/userVisitedRooms`, data, config)
+			.then((response) => {
 
-		if(success === 1){
-			return setRoomVisited(response.data.data)
-		}
-		})
+				const success = response.data.success;
+
+				if (success === 0) {
+					return alert('An error has occured...');
+				}
+
+				if (success === 1) {
+					return setRoomVisited(response.data.data)
+				}
+			})
 	}
 
 	const [notificationCounts, setNotificationCounts] = useState(1);
@@ -73,16 +73,16 @@ const RoomVisited = ({ navigation, route: {params: {id, type}}}) => {
 		setNotifVisible(!notifVisible);
 	};
 
-	const viewHistoryData = (room_id, building_name, room_number, date,time) =>{
+	const viewHistoryData = (room_id, building_name, room_number, date, time) => {
 
 		Alert.alert(
 			"Room visited History",
-			"Room ID: " + room_id +  "\n Building name : " + building_name  +  "\n Room number: " + room_number
-			+  "\n Date: " + date  +  "\n Time: " + time,
+			"Room ID: " + room_id + "\n Building name : " + building_name + "\n Room number: " + room_number
+			+ "\n Date: " + date + "\n Time: " + time,
 			[
-			  { text: "OK", onPress: () => {}}
+				{ text: "OK", onPress: () => { } }
 			]
-		  );
+		);
 	}
 
 	return (
@@ -91,7 +91,7 @@ const RoomVisited = ({ navigation, route: {params: {id, type}}}) => {
 			<View style={styles.mainContainer}>
 				<View style={styles.topContainer}>
 					<View style={styles.backIcon}>
-						<TouchableWithoutFeedback onPress={() => {navigation.goBack()}}>
+						<TouchableWithoutFeedback onPress={() => { navigation.goBack() }}>
 							<ImageBackground
 								source={require("../assets/back-icon.png")}
 								resizeMode="contain"
@@ -100,11 +100,11 @@ const RoomVisited = ({ navigation, route: {params: {id, type}}}) => {
 						</TouchableWithoutFeedback>
 					</View>
 				</View>
-				<View style={{ width: 340, height:'auto' }}>
+				<View style={{ width: 340, height: 'auto' }}>
 					<Text style={styles.roomVisitedText}>Room Visited</Text>
 				</View>
 				<ScrollView style={styles.tableContainer}>
-				<DataTable
+					<DataTable
 						style={{
 							borderWidth: 1,
 							borderRadius: 10,
@@ -119,32 +119,32 @@ const RoomVisited = ({ navigation, route: {params: {id, type}}}) => {
 								elevation: 5
 							}}
 						>
-						<DataTable.Title><Text style={{fontSize: 14, fontWeight: 'bold'}}>Room Id</Text></DataTable.Title>
-						<DataTable.Title><Text style={{fontSize: 14, fontWeight: 'bold'}}>Bldg name</Text></DataTable.Title>
-						<DataTable.Title><Text style={{fontSize: 14, fontWeight: 'bold'}}>Room no.</Text></DataTable.Title>
-						<DataTable.Title><Text style={{fontSize: 14, fontWeight: 'bold'}}>Date</Text></DataTable.Title>
-						<DataTable.Title><Text style={{fontSize: 14, fontWeight: 'bold'}}>Time</Text></DataTable.Title>
+							<DataTable.Title><Text style={{ fontSize: 14, fontWeight: 'bold' }}>Room Id</Text></DataTable.Title>
+							<DataTable.Title><Text style={{ fontSize: 14, fontWeight: 'bold' }}>Bldg name</Text></DataTable.Title>
+							<DataTable.Title><Text style={{ fontSize: 14, fontWeight: 'bold' }}>Room no.</Text></DataTable.Title>
+							<DataTable.Title><Text style={{ fontSize: 14, fontWeight: 'bold' }}>Date</Text></DataTable.Title>
+							<DataTable.Title><Text style={{ fontSize: 14, fontWeight: 'bold' }}>Time</Text></DataTable.Title>
 						</DataTable.Header>
 						{
-							roomVisited === []?
-							<View>
-								<Text style={styles.rowBody}>No rooms visited</Text>
-							</View>
-							:
-							roomVisited.map((room)  => {
-								return <DataTable.Row key={room.id} 
-								onPress={() => {viewHistoryData(room.room_id, room.building_name, room.room_number, moment(room.createdAt).format('MM-DD-YY'), moment(room.createdAt).format('HH:mm A'))}}>
-											<DataTable.Cell>{room.room_id}</DataTable.Cell>
-											<DataTable.Cell>{room.building_name}</DataTable.Cell>
-											<DataTable.Cell>{room.room_number}</DataTable.Cell>
-											<DataTable.Cell>{moment(room.createdAt).format('MM-DD-YY')}</DataTable.Cell>
-											<DataTable.Cell>{moment(room.createdAt).format('HH:mm A')}</DataTable.Cell>
+							roomVisited === [] ?
+								<View>
+									<Text style={styles.rowBody}>No rooms visited</Text>
+								</View>
+								:
+								roomVisited.map((room) => {
+									return <DataTable.Row key={room.id}
+										onPress={() => { viewHistoryData(room.room_id, room.building_name, room.room_number, moment(room.createdAt).format('MM-DD-YY'), moment(room.createdAt).format('HH:mm A')) }}>
+										<DataTable.Cell>{room.room_id}</DataTable.Cell>
+										<DataTable.Cell>{room.building_name}</DataTable.Cell>
+										<DataTable.Cell>{room.room_number}</DataTable.Cell>
+										<DataTable.Cell>{moment(room.createdAt).format('MM-DD-YY')}</DataTable.Cell>
+										<DataTable.Cell>{moment(room.createdAt).format('HH:mm A')}</DataTable.Cell>
 
-										</DataTable.Row>
-							})
-							
+									</DataTable.Row>
+								})
+
 						}
-						
+
 					</DataTable>
 				</ScrollView>
 			</View>
@@ -160,10 +160,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 40,
 		height: "100%",
 	},
-	roomVisitedText: { 
+	roomVisitedText: {
 		color: "#364D39",
-		fontSize:28,
-		fontWeight:'bold',
+		fontSize: 28,
+		fontWeight: 'bold',
 		marginBottom: 10
 	},
 	tableContainer: {
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
 		justifyContent: "flex-start",
 		paddingHorizontal: 0,
 	},
-	
+
 	backIcon: {
 		height: 60,
 		width: 60,

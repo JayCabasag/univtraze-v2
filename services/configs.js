@@ -1,0 +1,1 @@
+export const PRODUCTION_SERVER = 'https://univtraze-web-api-v1.onrender.com/api'

@@ -214,7 +214,7 @@ const ReportEmergency = ({ navigation }) => {
 
 		setLoading(true)
 
-		await axios.post('https://univtraze.herokuapp.com/api/covid_cases/addEmergencyReport', data, {
+		await axios.post(`${PRODUCTION_SERVER}/covid_cases/addEmergencyReport`, data, {
 			headers: headers
 		})
 			.then((response) => {

@@ -84,29 +84,29 @@ const Dashboard = ({ navigation, route }) => {
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
-			
-		const data = {   
+
+		const data = {
 			notification_is_viewed: 1,
 			notification_for: userId
 		}
 
-		await axios.post(`https://univtraze.herokuapp.com/api/notifications/updateUserNotificationStatus `, data, config)
-		.then((response) => {
+		await axios.post(`${PRODUCTION_SERVER}/notifications/updateUserNotificationStatus `, data, config)
+			.then((response) => {
 
-		const success = response.data.success;
+				const success = response.data.success;
 
-		if(success === 0){
-			return 
-		}
+				if (success === 0) {
+					return
+				}
 
-		if(success === 1){
-			return
-		}
+				if (success === 1) {
+					return
+				}
 
-		alert('Something went wrong... Please try again')
+				alert('Something went wrong... Please try again')
 
-		});
-		
+			});
+
 
 
 	}
@@ -115,119 +115,119 @@ const Dashboard = ({ navigation, route }) => {
 		var decodedToken = jwtDecode(currentToken);
 		getUserDetails(decodedToken.result.id, currentToken, decodedToken.result.type || route.params.type);
 		handleGetNotifications(decodedToken.result.id, 0, currentToken)
-	
+
 	};
 
 	const getTotalActiveNotifications = async (currentToken) => {
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
-		
-		const data = {   
+
+		const data = {
 			user_id: userId
 		}
-		
-		await axios.post(`https://univtraze.herokuapp.com/api/notifications/getTotalActiveUserNotifications`, data, config)
-		.then((response) => {
 
-		const success = response.data.success;
+		await axios.post(`${PRODUCTION_SERVER}/notifications/getTotalActiveUserNotifications`, data, config)
+			.then((response) => {
 
-		if(success === 0){
-			return alert('An error occured while getting on-going cases')
-		}
+				const success = response.data.success;
 
-		if(success === 1){
-			return setNotificationCounts(response.data.results.total_notifications)
-		}
+				if (success === 0) {
+					return alert('An error occured while getting on-going cases')
+				}
 
-		alert('Something went wrong... Please try again')
+				if (success === 1) {
+					return setNotificationCounts(response.data.results.total_notifications)
+				}
 
-		});
+				alert('Something went wrong... Please try again')
+
+			});
 	}
 
 	const getOnGoingCommunicableDiseaseCase = async (currentToken) => {
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
-		
-		const data = {   
+
+		const data = {
 			case_status: "On-going"
 		}
-		
-		await axios.post(`https://univtraze.herokuapp.com/api/communicable_disease/getCommunicableDiseaseByStatus`, data, config)
-		.then((response) => {
 
-		const success = response.data.success;
+		await axios.post(`${PRODUCTION_SERVER}/communicable_disease/getCommunicableDiseaseByStatus`, data, config)
+			.then((response) => {
 
-		if(success === 0){
-			return alert('An error occured while getting on-going cases')
-		}
+				const success = response.data.success;
 
-		if(success === 1){
-			return setReportedCommunicableDiseaseOnGoing(response.data.data)
-		}
+				if (success === 0) {
+					return alert('An error occured while getting on-going cases')
+				}
 
-		alert('Something went wrong... Please try again')
+				if (success === 1) {
+					return setReportedCommunicableDiseaseOnGoing(response.data.data)
+				}
 
-		});
+				alert('Something went wrong... Please try again')
+
+			});
 	}
 
 	const getResolvedCommunicableDiseaseCase = async (currentToken) => {
-		
+
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
-		
-		const data = {   
+
+		const data = {
 			case_status: "Resolved"
 		}
-		
-		await axios.post(`https://univtraze.herokuapp.com/api/communicable_disease/getCommunicableDiseaseByStatus`, data, config)
-		.then((response) => {
 
-		const success = response.data.success;
+		await axios.post(`${PRODUCTION_SERVER}/communicable_disease/getCommunicableDiseaseByStatus`, data, config)
+			.then((response) => {
 
-		if(success === 0){
-			return alert('An error occured while getting resolved cases')
-		}
+				const success = response.data.success;
 
-		if(success === 1){
-			return setReportedCommunicableDiseaseResolved(response.data.data)
-		}
+				if (success === 0) {
+					return alert('An error occured while getting resolved cases')
+				}
 
-		alert('Something went wrong... Please try again')
+				if (success === 1) {
+					return setReportedCommunicableDiseaseResolved(response.data.data)
+				}
 
-		});
+				alert('Something went wrong... Please try again')
+
+			});
 	}
 
 
-	const getUserDetails = async (userId, currentToken, userType) => {	
+	const getUserDetails = async (userId, currentToken, userType) => {
 
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
-		
+
 		const data = {
 			id: userId,
-		};      
-		await axios.post(`https://univtraze.herokuapp.com/api/user/${userType}`, data, config)
-		.then((response) => {
-		const success = response.data.success;
+		};
+		await axios.post(`${PRODUCTION_SERVER}/user/${userType}`, data, config)
+			.then((response) => {
+				const success = response.data.success;
 
-		if(success === 0 && message === "No data found for this user"){
-			return navigation.navigate("SignUpUserType");
-		}
+				if (success === 0 && message === "No data found for this user") {
+					return navigation.navigate("SignUpUserType");
+				}
 
-		if(success === 0 && message === "Invalid token"){
-			alert("Please re-login to continue")
-			return navigation.navigate("Login");
-		}
+				if (success === 0 && message === "Invalid token") {
+					alert("Please re-login to continue")
+					return navigation.navigate("Login");
+				}
 
-		setFullname(response.data.data.firstname + " " + response.data.data.lastname)
-		setUserId(userId)
-		setType(userType)
-		setProfileUrl(response.data.data.profile_url)
-		});
+				setFullname(response.data.data.firstname + " " + response.data.data.lastname)
+				setUserId(userId)
+				setType(userType)
+				setProfileUrl(response.data.data.profile_url)
+			});
 
 	};
 
@@ -248,24 +248,24 @@ const Dashboard = ({ navigation, route }) => {
 	};
 
 	const handleGetNotifications = async (user_id, offset, token) => {
-		  const config = {
-			  headers: { Authorization: `Bearer ${token}` }
-		  };
-		  
-		  const data = {
-			  user_id: user_id,
-			  start_at: offset
-		  };      
-		  await axios.post(`https://univtraze.herokuapp.com/api/notifications/getUserNotificationsById`, data, config)
-		  .then((response) => {
-			  if(response.data.success === 0){
-				  return console.log(response.data)
-			  }
-  
-			  let returnArray = response.data.results
-			  return setNotificationLists(returnArray)
-		  })
-	  }
+		const config = {
+			headers: { Authorization: `Bearer ${token}` }
+		};
+
+		const data = {
+			user_id: user_id,
+			start_at: offset
+		};
+		await axios.post(`${PRODUCTION_SERVER}/notifications/getUserNotificationsById`, data, config)
+			.then((response) => {
+				if (response.data.success === 0) {
+					return console.log(response.data)
+				}
+
+				let returnArray = response.data.results
+				return setNotificationLists(returnArray)
+			})
+	}
 
 
 	// Return
@@ -314,8 +314,8 @@ const Dashboard = ({ navigation, route }) => {
 						</TouchableWithoutFeedback>
 					</View>
 					{/*bottom navigation for user settings  */}
-		
-					<Menu visible={visible} toggleBottomNavigationView={toggleBottomNavigationView} props={{userId, fullname, type, profileUrl}} navigation={navigation}/>
+
+					<Menu visible={visible} toggleBottomNavigationView={toggleBottomNavigationView} props={{ userId, fullname, type, profileUrl }} navigation={navigation} />
 
 
 					{/*end of bottom navigation for user settings  */}
@@ -323,7 +323,7 @@ const Dashboard = ({ navigation, route }) => {
 					{/* start of botton sheet for notification */}
 
 
-					<Notifications notifVisible={notifVisible} toggleNotifNavigationView={toggleNotifNavigationView} props={{userId, token, notificationLists}} navigation={navigation}/>
+					<Notifications notifVisible={notifVisible} toggleNotifNavigationView={toggleNotifNavigationView} props={{ userId, token, notificationLists }} navigation={navigation} />
 
 				</View>
 				{/*End  Notification View */}
@@ -345,7 +345,7 @@ const Dashboard = ({ navigation, route }) => {
 								<TouchableOpacity
 									style={styles.btnScnQr}
 									onPress={() => {
-										navigation.navigate("QrScanner", {type: type, id: userId, token: token});
+										navigation.navigate("QrScanner", { type: type, id: userId, token: token });
 									}}
 								>
 									<ImageBackground
@@ -357,7 +357,7 @@ const Dashboard = ({ navigation, route }) => {
 								<TouchableOpacity
 									style={styles.btnRepCovidTest}
 									onPress={() => {
-										navigation.navigate("ReportCovidCase", {id: userId, type: type});
+										navigation.navigate("ReportCovidCase", { id: userId, type: type });
 									}}
 								>
 									<ImageBackground
@@ -370,7 +370,7 @@ const Dashboard = ({ navigation, route }) => {
 								<TouchableOpacity
 									style={styles.btnRepEmergency}
 									onPress={() => {
-										navigation.navigate("ReportEmergency", {id: userId, type: type});
+										navigation.navigate("ReportEmergency", { id: userId, type: type });
 									}}
 								>
 									<ImageBackground
@@ -384,7 +384,7 @@ const Dashboard = ({ navigation, route }) => {
 
 						<View>
 							<Text
-							numberOfLines={1}
+								numberOfLines={1}
 								style={{ fontSize: 22, fontWeight: "bold", marginStart: 35 }}
 							>
 								Communicable Disease Reports
@@ -404,10 +404,10 @@ const Dashboard = ({ navigation, route }) => {
 									style={{ fontSize: 22, fontWeight: "bold", color: "#28CD41" }}
 								>
 									{
-										reportedCommunicableDiseaseOnGoing && reportedCommunicableDiseaseOnGoing?
-										reportedCommunicableDiseaseOnGoing.length
-										:
-										0
+										reportedCommunicableDiseaseOnGoing && reportedCommunicableDiseaseOnGoing ?
+											reportedCommunicableDiseaseOnGoing.length
+											:
+											0
 									}
 								</Text>
 							</ImageBackground>
@@ -422,10 +422,10 @@ const Dashboard = ({ navigation, route }) => {
 									style={{ fontSize: 22, fontWeight: "bold", color: "#28CD41" }}
 								>
 									{
-										reportedCommunicableDiseaseResolved && reportedCommunicableDiseaseResolved?
-										reportedCommunicableDiseaseResolved.length
-										:
-										0
+										reportedCommunicableDiseaseResolved && reportedCommunicableDiseaseResolved ?
+											reportedCommunicableDiseaseResolved.length
+											:
+											0
 									}
 								</Text>
 							</ImageBackground>

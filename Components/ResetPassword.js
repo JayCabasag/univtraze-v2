@@ -6,16 +6,16 @@ import {
 	View,
 	TouchableOpacity,
 	Text,
-	StatusBar, 
+	StatusBar,
 	Modal
 } from "react-native";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
 import { Dimensions } from 'react-native';
 
-const ResetPassword = ({ navigation, route: {params: {email, recovery_password}} }) => {
+const ResetPassword = ({ navigation, route: { params: { email, recovery_password } } }) => {
 
 
 	const [error, setError] = useState(false);
@@ -30,25 +30,25 @@ const ResetPassword = ({ navigation, route: {params: {email, recovery_password}}
 
 
 	const handleResetPassword = async () => {
-		if(newPassword === ''){
+		if (newPassword === '') {
 			setError(true)
 			setErrorMessage('Please input new password')
 			setSuccess(false)
 			return
 		}
-		if(newPassword.length <= 7){
+		if (newPassword.length <= 7) {
 			setError(true)
 			setErrorMessage('Password should have atleast 8 characters')
 			setSuccess(false)
 			return
 		}
-		if(confirmNewPassword === ''){
+		if (confirmNewPassword === '') {
 			setError(true)
 			setErrorMessage('Please re-type new password')
 			setSuccess(false)
 			return
 		}
-		if(newPassword !== confirmNewPassword){
+		if (newPassword !== confirmNewPassword) {
 			setError(true)
 			setErrorMessage('Password don\'t matched')
 			setSuccess(false)
@@ -57,36 +57,36 @@ const ResetPassword = ({ navigation, route: {params: {email, recovery_password}}
 		setShowLoadingModal(true)
 		setShowLoadingModal('Resetting your password.')
 		try {
-			const data = {   
+			const data = {
 				email: email,
 				recovery_password: recovery_password,
 				new_password: confirmNewPassword
 			}
-			
-			await axios.post(`https://univtraze.herokuapp.com/api/user/updateUserPasswordFromRecovery`, data)
-			.then((response) => {
-	
-			const success = response.data.success;
+
+			await axios.post(`${PRODUCTION_SERVER}/user/updateUserPasswordFromRecovery`, data)
+				.then((response) => {
+
+					const success = response.data.success;
 
 
-			if(success === false){
-				setError(true)
-				setErrorMessage(response.data.message)
-				setSuccess(false)
-				setShowLoadingModal(false)
-				setShowLoadingModal(false)
-				setShowLoadingModal('')
-				return
-			}
-			
-			setError(false)
-			setErrorMessage('')
-			setSuccess(true)
-			setShowLoadingModal(false)
-			setShowLoadingModal(false)
-			setShowLoadingModal('')
-			alert("Password updated successfully.")
-			});
+					if (success === false) {
+						setError(true)
+						setErrorMessage(response.data.message)
+						setSuccess(false)
+						setShowLoadingModal(false)
+						setShowLoadingModal(false)
+						setShowLoadingModal('')
+						return
+					}
+
+					setError(false)
+					setErrorMessage('')
+					setSuccess(true)
+					setShowLoadingModal(false)
+					setShowLoadingModal(false)
+					setShowLoadingModal('')
+					alert("Password updated successfully.")
+				});
 		} catch (error) {
 			console.log(error)
 			setError(true)
@@ -98,60 +98,60 @@ const ResetPassword = ({ navigation, route: {params: {email, recovery_password}}
 	}
 
 	return (
-		<SafeAreaView style={{height: windowHeight, backgroundColor:"#E1F5E4"}}>
-		<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content'/>
-		<KeyboardAvoidingView style={styles.container} behavior='height'>
-			<Modal
-				animationType="slide"
-				transparent={true}
-				visible={showLoadingModal}
-				onRequestClose={() => {
-				setShowLoadingModal(!showLoadingModal);
-				}}>
-				<View style={styles.centeredView}>
-				<View style={styles.modalView}>
-					<Image
-						source={require("../assets/loading_icon.gif")}
-						resizeMode="contain"
-						style={{ width: 100, height: 100 }}
+		<SafeAreaView style={{ height: windowHeight, backgroundColor: "#E1F5E4" }}>
+			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
+			<KeyboardAvoidingView style={styles.container} behavior='height'>
+				<Modal
+					animationType="slide"
+					transparent={true}
+					visible={showLoadingModal}
+					onRequestClose={() => {
+						setShowLoadingModal(!showLoadingModal);
+					}}>
+					<View style={styles.centeredView}>
+						<View style={styles.modalView}>
+							<Image
+								source={require("../assets/loading_icon.gif")}
+								resizeMode="contain"
+								style={{ width: 100, height: 100 }}
+							/>
+							<Text style={styles.modalText}>{loadingMessage}</Text>
+						</View>
+					</View>
+				</Modal>
+				<View style={styles.inputContainer}>
+					<Text style={styles.loginText}>Reset password</Text>
+					<Text style={styles.label}>New password</Text>
+					<TextInput
+						placeholder="New password"
+						defaultValue={newPassword}
+						onChangeText={(text) => setNewPassword(text)}
+						style={styles.input}
+						secureTextEntry
 					/>
-					<Text style={styles.modalText}>{loadingMessage}</Text>
-				</View>
-				</View>
-			</Modal>
-			<View style={styles.inputContainer}>
-				<Text style={styles.loginText}>Reset password</Text>
-				<Text style={styles.label}>New password</Text>
-				<TextInput
-					placeholder="New password"
-					defaultValue={newPassword}
-					onChangeText={(text) => setNewPassword(text)}
-					style={styles.input}
-					secureTextEntry
-				/>
-				<Text style={styles.label}>Confirm new password</Text>
-				<TextInput
-					placeholder="Re-type password"
-					defaultValue={confirmNewPassword}
-					onChangeText={(text) => setConfirmNewPassword(text)}
-					style={styles.input}
-					secureTextEntry
-				/>
-			
+					<Text style={styles.label}>Confirm new password</Text>
+					<TextInput
+						placeholder="Re-type password"
+						defaultValue={confirmNewPassword}
+						onChangeText={(text) => setConfirmNewPassword(text)}
+						style={styles.input}
+						secureTextEntry
+					/>
 
-				{error ? (
-					<Text style={styles.errorMessage}>*{errorMessage}</Text>
-				) : success ? (
-					<Text style={styles.successMessage}>Password updated successfully</Text>
-				) : null}
+
+					{error ? (
+						<Text style={styles.errorMessage}>*{errorMessage}</Text>
+					) : success ? (
+						<Text style={styles.successMessage}>Password updated successfully</Text>
+					) : null}
 
 					<TouchableOpacity
 						onPress={() => handleResetPassword()}
 						style={styles.button}
-						>
-						
+					>
+
 						<Text style={styles.buttonText}>Reset password</Text>
-						
+
 					</TouchableOpacity>
 					<View style={styles.buttonContainer}>
 						<Text style={styles.returnHomeText} onPress={() => {
@@ -159,8 +159,8 @@ const ResetPassword = ({ navigation, route: {params: {email, recovery_password}}
 						}}>Return to login</Text>
 
 					</View>
-			</View>
-		</KeyboardAvoidingView>
+				</View>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 };
@@ -176,8 +176,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-	  },
-	  modalView: {
+	},
+	modalView: {
 		width: '80%',
 		margin: 20,
 		backgroundColor: 'white',
@@ -186,14 +186,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: {
-		  width: 0,
-		  height: 2,
+			width: 0,
+			height: 2,
 		},
 		shadowOpacity: 0.25,
 		shadowRadius: 4,
 		elevation: 5,
-	  },
-	  sendToEmailText: {
+	},
+	sendToEmailText: {
 		textAlign: "left",
 		color: "#4d7861",
 		marginBottom: 5,
@@ -201,9 +201,9 @@ const styles = StyleSheet.create({
 		width: 340,
 		marginLeft: 41,
 		marginRight: 41,
-	  },
+	},
 
-	  returnHomeText: {
+	returnHomeText: {
 		textAlign: "center",
 		lineHeight: 25,
 		marginTop: 15,
@@ -212,31 +212,31 @@ const styles = StyleSheet.create({
 		color: "#4d7861",
 		marginBottom: 10,
 		alignSelf: "center"
-	  },
-	  buttonContainer: {
+	},
+	buttonContainer: {
 		backgroundColor: "transparent",
-	  },
-	  button: {
+	},
+	button: {
 		borderRadius: 20,
 		padding: 10,
 		elevation: 2,
-	  },
-	  buttonOpen: {
+	},
+	buttonOpen: {
 		backgroundColor: '#F194FF',
-	  },
-	  buttonClose: {
+	},
+	buttonClose: {
 		backgroundColor: '#2196F3',
-	  },
-	  textStyle: {
+	},
+	textStyle: {
 		color: 'white',
 		fontWeight: 'bold',
 		textAlign: 'center',
-	  },
-	  modalText: {
+	},
+	modalText: {
 		marginBottom: 15,
 		textAlign: 'center',
 		color: "#4d7861"
-	  },
+	},
 	image: {
 		justifyContent: "center",
 		width: "100%",
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		backgroundColor: "transparent"
-	},	
+	},
 	button: {
 		backgroundColor: "#28CD41",
 		padding: 10,
@@ -349,14 +349,14 @@ const styles = StyleSheet.create({
 		marginLeft: 41,
 		color: "red",
 		paddingVertical: 7.5,
-	},buttonContinue:{
-        backgroundColor: "#28CD41",
-        padding: 10,
-        borderRadius: 10,
-        paddingVertical: 18,
-        marginVertical:15,
-        width: 308,
-        height: 60,
-    }
+	}, buttonContinue: {
+		backgroundColor: "#28CD41",
+		padding: 10,
+		borderRadius: 10,
+		paddingVertical: 18,
+		marginVertical: 15,
+		width: 308,
+		height: 60,
+	}
 
 });

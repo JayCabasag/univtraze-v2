@@ -6,10 +6,10 @@ import {
 	View,
 	TouchableOpacity,
 	Text,
-	StatusBar, 
+	StatusBar,
 	Modal
 } from "react-native";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -51,30 +51,30 @@ const ForgotPassword = ({ navigation }) => {
 				setShowCodeInput(true)
 				setShowLoadingModal(true)
 				try {
-					const data = {   
+					const data = {
 						email: email
 					}
-					
-					await axios.post(`https://univtraze.herokuapp.com/api/user/sendRecoveryPasswordViaEmail`, data)
-					.then((response) => {
-			
-					const success = response.data.success;
 
-					if(success === false){
-						setError(true)
-						setErrorMessage(response.data.message)
-						setSuccess(false)
-						setShowLoadingModal(false)
-						return
-					}
-					
-					setError(false)
-					setErrorMessage('')
-					setSuccess(true)
-					setShowCodeInput(true)
-					setShowLoadingModal(false)
-					
-					});
+					await axios.post(`${PRODUCTION_SERVER}/user/sendRecoveryPasswordViaEmail`, data)
+						.then((response) => {
+
+							const success = response.data.success;
+
+							if (success === false) {
+								setError(true)
+								setErrorMessage(response.data.message)
+								setSuccess(false)
+								setShowLoadingModal(false)
+								return
+							}
+
+							setError(false)
+							setErrorMessage('')
+							setSuccess(true)
+							setShowCodeInput(true)
+							setShowLoadingModal(false)
+
+						});
 				} catch (error) {
 					setError(true)
 					setSuccess(false)
@@ -93,18 +93,18 @@ const ForgotPassword = ({ navigation }) => {
 	};
 
 
-    const [shoot, setShoot] = useState(false);
+	const [shoot, setShoot] = useState(false);
 
-    useEffect(() => {
-      //Time out to fire the cannon
-      setTimeout(() => {
-        setShoot(true);
-      }, 1000);
-    }, []);
-  
+	useEffect(() => {
+		//Time out to fire the cannon
+		setTimeout(() => {
+			setShoot(true);
+		}, 1000);
+	}, []);
+
 	const verifyViaEmailRecovery = async () => {
 
-		if(codeInput === ''){
+		if (codeInput === '') {
 			setSuccess(false)
 			setError(true);
 			setErrorMessage("Please input recovery password");
@@ -113,32 +113,32 @@ const ForgotPassword = ({ navigation }) => {
 		}
 
 		try {
-			const data = {   
+			const data = {
 				email: email,
 				recovery_password: codeInput
 			}
-			
-			await axios.post(`https://univtraze.herokuapp.com/api/user/checkRecoveryPasswordAndEmailMatched`, data)
-			.then((response) => {
-	
-			const success = response.data.success;
 
-			if(success === false){
-				setError(true)
-				setErrorMessage(response.data.message)
-				setSuccess(false)
-				setShowLoadingModal(false)
-				return
-			}
-			
-			setError(false)
-			setErrorMessage('')
-			setSuccess(true)
-			setShowCodeInput(true)
-			setShowLoadingModal(false)
-			navigation.navigate("ResetPassword", {email, recovery_password: codeInput});
-			
-			});
+			await axios.post(`${PRODUCTION_SERVER}/user/checkRecoveryPasswordAndEmailMatched`, data)
+				.then((response) => {
+
+					const success = response.data.success;
+
+					if (success === false) {
+						setError(true)
+						setErrorMessage(response.data.message)
+						setSuccess(false)
+						setShowLoadingModal(false)
+						return
+					}
+
+					setError(false)
+					setErrorMessage('')
+					setSuccess(true)
+					setShowCodeInput(true)
+					setShowLoadingModal(false)
+					navigation.navigate("ResetPassword", { email, recovery_password: codeInput });
+
+				});
 		} catch (error) {
 			setError(true)
 			setSuccess(false)
@@ -150,91 +150,91 @@ const ForgotPassword = ({ navigation }) => {
 
 
 	return (
-		<SafeAreaView style={{height: windowHeight, backgroundColor:"#E1F5E4"}}>
-		<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content'/>
-		<KeyboardAvoidingView style={styles.container} behavior='height'>
-			<Modal
-				animationType="slide"
-				transparent={true}
-				visible={showLoadingModal}
-				onRequestClose={() => {
-				setShowLoadingModal(!showLoadingModal);
-				}}>
-				<View style={styles.centeredView}>
-				<View style={styles.modalView}>
-					<Image
-						source={require("../assets/loading_icon.gif")}
-						resizeMode="contain"
-						style={{ width: 100, height: 100 }}
+		<SafeAreaView style={{ height: windowHeight, backgroundColor: "#E1F5E4" }}>
+			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
+			<KeyboardAvoidingView style={styles.container} behavior='height'>
+				<Modal
+					animationType="slide"
+					transparent={true}
+					visible={showLoadingModal}
+					onRequestClose={() => {
+						setShowLoadingModal(!showLoadingModal);
+					}}>
+					<View style={styles.centeredView}>
+						<View style={styles.modalView}>
+							<Image
+								source={require("../assets/loading_icon.gif")}
+								resizeMode="contain"
+								style={{ width: 100, height: 100 }}
+							/>
+							<Text style={styles.modalText}>{loadingMessage}</Text>
+						</View>
+					</View>
+				</Modal>
+				<View style={styles.inputContainer}>
+					<Text style={styles.loginText}>Forgot password</Text>
+					<Text style={styles.label}>Email</Text>
+					<TextInput
+						placeholder="Email Address"
+						defaultValue={email}
+						onChangeText={(text) => setEmail(text)}
+						style={styles.input}
 					/>
-					<Text style={styles.modalText}>{loadingMessage}</Text>
-				</View>
-				</View>
-			</Modal>
-			<View style={styles.inputContainer}>
-				<Text style={styles.loginText}>Forgot password</Text>
-				<Text style={styles.label}>Email</Text>
-				<TextInput
-					placeholder="Email Address"
-					defaultValue={email}
-					onChangeText={(text) => setEmail(text)}
-					style={styles.input}
-				/>
-				
-				{
-					showCodeInput?
-					<>
-					<Text style={styles.label}>Code</Text>
-						<TextInput
-							placeholder="Recovery code"
-							defaultValue={codeInput}
-							onChangeText={(text) => setCodeInput(text)}
-							style={styles.input}
-						/>
-					</>
-					:
-					null
-				}
 
-				{error ? (
-					<Text style={styles.errorMessage}>*{errorMessage}</Text>
-				) : success ? (
-					<Text style={styles.successMessage}>Recovery password sent to your email</Text>
-				) : null}
+					{
+						showCodeInput ?
+							<>
+								<Text style={styles.label}>Code</Text>
+								<TextInput
+									placeholder="Recovery code"
+									defaultValue={codeInput}
+									onChangeText={(text) => setCodeInput(text)}
+									style={styles.input}
+								/>
+							</>
+							:
+							null
+					}
+
+					{error ? (
+						<Text style={styles.errorMessage}>*{errorMessage}</Text>
+					) : success ? (
+						<Text style={styles.successMessage}>Recovery password sent to your email</Text>
+					) : null}
 
 					<TouchableOpacity
 						onPress={() => validateUserInput()}
 						style={styles.button}
-						>
+					>
 						{
-							showCodeInput?
-							<Text style={styles.buttonText}>Resend to Email</Text>
-							:
-							<Text style={styles.buttonText}>Send to Email</Text>
+							showCodeInput ?
+								<Text style={styles.buttonText}>Resend to Email</Text>
+								:
+								<Text style={styles.buttonText}>Send to Email</Text>
 						}
-						
+
 					</TouchableOpacity>
-			</View>
+				</View>
 
-			<View style={styles.buttonContainer}>
-				{
-					showCodeInput?
-					<TouchableOpacity
-						onPress={() => verifyViaEmailRecovery()}
-						style={styles.button}
-						>
-						<Text style={styles.buttonText}>Verify</Text>
-					</TouchableOpacity>
-					:
-					null
-				}
+				<View style={styles.buttonContainer}>
+					{
+						showCodeInput ?
+							<TouchableOpacity
+								onPress={() => verifyViaEmailRecovery()}
+								style={styles.button}
+							>
+								<Text style={styles.buttonText}>Verify</Text>
+							</TouchableOpacity>
+							:
+							null
+					}
 
-				<Text style={styles.returnHomeText} onPress={() => {
-					navigation.goBack()
-				}}>Return to login</Text>
+					<Text style={styles.returnHomeText} onPress={() => {
+						navigation.goBack()
+					}}>Return to login</Text>
 
-			</View>
-		</KeyboardAvoidingView>
+				</View>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 };
@@ -250,8 +250,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-	  },
-	  modalView: {
+	},
+	modalView: {
 		width: '80%',
 		margin: 20,
 		backgroundColor: 'white',
@@ -260,14 +260,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: {
-		  width: 0,
-		  height: 2,
+			width: 0,
+			height: 2,
 		},
 		shadowOpacity: 0.25,
 		shadowRadius: 4,
 		elevation: 5,
-	  },
-	  sendToEmailText: {
+	},
+	sendToEmailText: {
 		textAlign: "left",
 		color: "#4d7861",
 		marginBottom: 5,
@@ -275,9 +275,9 @@ const styles = StyleSheet.create({
 		width: 340,
 		marginLeft: 41,
 		marginRight: 41,
-	  },
+	},
 
-	  returnHomeText: {
+	returnHomeText: {
 		textAlign: "center",
 		lineHeight: 25,
 		marginTop: 15,
@@ -286,31 +286,31 @@ const styles = StyleSheet.create({
 		color: "#4d7861",
 		marginBottom: 10,
 		alignSelf: "center"
-	  },
-	  buttonContainer: {
+	},
+	buttonContainer: {
 		backgroundColor: "transparent",
-	  },
-	  button: {
+	},
+	button: {
 		borderRadius: 20,
 		padding: 10,
 		elevation: 2,
-	  },
-	  buttonOpen: {
+	},
+	buttonOpen: {
 		backgroundColor: '#F194FF',
-	  },
-	  buttonClose: {
+	},
+	buttonClose: {
 		backgroundColor: '#2196F3',
-	  },
-	  textStyle: {
+	},
+	textStyle: {
 		color: 'white',
 		fontWeight: 'bold',
 		textAlign: 'center',
-	  },
-	  modalText: {
+	},
+	modalText: {
 		marginBottom: 15,
 		textAlign: 'center',
 		color: "#4d7861"
-	  },
+	},
 	image: {
 		justifyContent: "center",
 		width: "100%",
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		backgroundColor: "transparent"
-	},	
+	},
 	button: {
 		backgroundColor: "#28CD41",
 		padding: 10,
@@ -423,14 +423,14 @@ const styles = StyleSheet.create({
 		marginLeft: 41,
 		color: "red",
 		paddingVertical: 7.5,
-	},buttonContinue:{
-        backgroundColor: "#28CD41",
-        padding: 10,
-        borderRadius: 10,
-        paddingVertical: 18,
-        marginVertical:15,
-        width: 308,
-        height: 60,
-    }
+	}, buttonContinue: {
+		backgroundColor: "#28CD41",
+		padding: 10,
+		borderRadius: 10,
+		paddingVertical: 18,
+		marginVertical: 15,
+		width: 308,
+		height: 60,
+	}
 
 });

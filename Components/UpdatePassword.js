@@ -24,7 +24,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { useToast } from "react-native-toast-notifications";
 
 
-const UpdatePassword = ({ navigation, route}) => {
+const UpdatePassword = ({ navigation, route }) => {
 
 	const toast = useToast()
 	// console.log(route.params.token)
@@ -44,34 +44,34 @@ const UpdatePassword = ({ navigation, route}) => {
 
 
 	const handleUpdatePassword = async () => {
-		
+
 		setIsLoading(false)
 		setError(false)
 		setSuccess(false)
 
-		if(oldPassword === ''){
+		if (oldPassword === '') {
 			setError(true)
 			setErrorMessage('Please enter old password.')
 			return
 		}
-		if(newPassword === ''){
+		if (newPassword === '') {
 			setError(true)
 			setErrorMessage('Please enter new password.')
 			return
 		}
-		if(confirmNewPassword === ''){
+		if (confirmNewPassword === '') {
 			setError(true)
 			setErrorMessage('Please enter confirm password.')
 			return
 		}
 
-		if(newPassword.length <= 7){
+		if (newPassword.length <= 7) {
 			setError(true)
 			setErrorMessage('Password should contain at least 8 characters')
 			return
 		}
-		
-		if(newPassword !== confirmNewPassword){
+
+		if (newPassword !== confirmNewPassword) {
 			setError(true)
 			setErrorMessage('New password and confirm password does not match.')
 			return
@@ -80,8 +80,8 @@ const UpdatePassword = ({ navigation, route}) => {
 		const config = {
 			headers: { Authorization: `Bearer ${token}` }
 		};
-			
-		const data = {   
+
+		const data = {
 			user_id: userId,
 			old_password: oldPassword,
 			new_password: confirmNewPassword
@@ -89,28 +89,28 @@ const UpdatePassword = ({ navigation, route}) => {
 
 		setIsLoading(true)
 		try {
-			await axios.post(`https://univtraze.herokuapp.com/api/user/changePassword`, data, config)
-			.then((response) => {
-				const success = response.data.success;
-				
-				if(success === 0){
-					setError(true)
-					setErrorMessage(response.data.message)
-					setSuccess(false)
+			await axios.post(`${PRODUCTION_SERVER}/user/changePassword`, data, config)
+				.then((response) => {
+					const success = response.data.success;
+
+					if (success === 0) {
+						setError(true)
+						setErrorMessage(response.data.message)
+						setSuccess(false)
+						setIsLoading(false)
+						return
+					}
+
+					setError(false)
+					setErrorMessage('')
+					setSuccess(true)
 					setIsLoading(false)
-					return
-				}
 
-				setError(false)
-				setErrorMessage('')
-				setSuccess(true)
-				setIsLoading(false)
+					setOldPassword('')
+					setNewPassword('')
+					setConfirmNewPassword('')
 
-				setOldPassword('')
-				setNewPassword('')
-				setConfirmNewPassword('')
-
-			});
+				});
 		} catch (error) {
 			setError(false)
 			setErrorMessage('Network connection error.')
@@ -123,10 +123,10 @@ const UpdatePassword = ({ navigation, route}) => {
 		<SafeAreaView>
 			<StatusBar animated={true} backgroundColor="#E1F5E4" />
 			<View style={styles.container}>
-				
+
 				<View style={styles.topContainer}>
 					<View style={styles.backIcon}>
-						<TouchableWithoutFeedback onPress={() => {navigation.goBack()}}>
+						<TouchableWithoutFeedback onPress={() => { navigation.goBack() }}>
 							<ImageBackground
 								source={require("../assets/back-icon.png")}
 								resizeMode="contain"
@@ -141,30 +141,30 @@ const UpdatePassword = ({ navigation, route}) => {
 				<View style={styles.bodyContainer}>
 					<Text style={styles.headerText}>Update Password</Text>
 
-					<TextInput placeholder="Old password" value={oldPassword} style={styles.input} secureTextEntry onChangeText={(text) => setOldPassword(text)}/>
-					<TextInput placeholder="New password" value={newPassword} style={styles.input} secureTextEntry onChangeText={(text) => setNewPassword(text)}/>
-					<TextInput placeholder="Re-type password" value={confirmNewPassword} style={styles.input} secureTextEntry onChangeText={(text) => setConfirmNewPassword(text)}/>
+					<TextInput placeholder="Old password" value={oldPassword} style={styles.input} secureTextEntry onChangeText={(text) => setOldPassword(text)} />
+					<TextInput placeholder="New password" value={newPassword} style={styles.input} secureTextEntry onChangeText={(text) => setNewPassword(text)} />
+					<TextInput placeholder="Re-type password" value={confirmNewPassword} style={styles.input} secureTextEntry onChangeText={(text) => setConfirmNewPassword(text)} />
 					{
-						error?
-						<Text style={{color: 'red'}}>{errorMessage}</Text>
-						:
-						null
+						error ?
+							<Text style={{ color: 'red' }}>{errorMessage}</Text>
+							:
+							null
 					}
 					{
-						success?
-						<Text style={{color: '#28CD41'}}>Password updated successfully</Text>
-						:
-						null
+						success ?
+							<Text style={{ color: '#28CD41' }}>Password updated successfully</Text>
+							:
+							null
 					}
 					{
-						isLoading?
-						<Text style={{color: '#28CD41'}}>Please wait ...</Text>
-						:
-						null
+						isLoading ?
+							<Text style={{ color: '#28CD41' }}>Please wait ...</Text>
+							:
+							null
 					}
 
 					<TouchableOpacity style={styles.buttons} onPress={() => handleUpdatePassword()}>
-						<Text style={{fontSize: 15, color: 'white'}}>Update password</Text>
+						<Text style={{ fontSize: 15, color: 'white' }}>Update password</Text>
 					</TouchableOpacity>
 				</View>
 			</View>
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
 		width: 60,
 		marginLeft: -15,
 		justifyContent: "center",
-		
+
 	},
 	image: {
 		width: "100%",
@@ -270,12 +270,12 @@ const styles = StyleSheet.create({
 	},
 	deactivateButton: {
 		height: 35,
-		justifyContent: 'center', 
+		justifyContent: 'center',
 		alignSelf: 'center',
-	    backgroundColor: 'red', 
+		backgroundColor: 'red',
 		alignItems: 'center',
-		borderRadius: 5, 
-		paddingHorizontal: 10, 
+		borderRadius: 5,
+		paddingHorizontal: 10,
 		marginTop: 15
 	},
 	deactivateButtonText: {
@@ -284,26 +284,26 @@ const styles = StyleSheet.create({
 	},
 	cancelButton: {
 		height: 35,
-		justifyContent: 'center', 
+		justifyContent: 'center',
 		alignSelf: 'center',
-	    backgroundColor: 'white',
-		borderWidth: 1, 
+		backgroundColor: 'white',
+		borderWidth: 1,
 		alignItems: 'center',
-		borderRadius: 5, 
-		paddingHorizontal: 10, 
+		borderRadius: 5,
+		paddingHorizontal: 10,
 		marginTop: 15
 	},
 	cancelButtonText: {
 		color: 'black',
 		fontSize: 15
-	}, 
-	settingsOption: 
+	},
+	settingsOption:
 	{
-		width: '100%', 
-		height: 50, 
+		width: '100%',
+		height: 50,
 		justifyContent: 'space-between',
-		alignItems: 'center', 
-		display: 'flex', 
+		alignItems: 'center',
+		display: 'flex',
 		flexDirection: 'row',
 	},
 	headerText: {

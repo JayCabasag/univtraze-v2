@@ -6,11 +6,11 @@ import {
 	View,
 	TouchableOpacity,
 	Text,
-	StatusBar, 
+	StatusBar,
 	Modal
 } from "react-native";
 import Checkbox from 'expo-checkbox';
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ConfettiCannon from 'react-native-confetti-cannon';
@@ -45,7 +45,7 @@ const SignUp = ({ navigation }) => {
 			setError(true);
 			setErrorMessage("Please agree with our app terms and conditions");
 			return
-		} 
+		}
 		if (email === "") {
 			setError(true);
 			setErrorMessage("Please input your email address");
@@ -65,7 +65,7 @@ const SignUp = ({ navigation }) => {
 					setErrorMessage("Confirm password did not match!");
 				} else {
 					//Data checking with api
-					
+
 					setShowLoadingModal(true)
 
 					const data = {
@@ -77,7 +77,7 @@ const SignUp = ({ navigation }) => {
 					setLoadingMessage('Please wait while creating your acccount...')
 
 					await axios
-						.post("https://univtraze.herokuapp.com/api/user/signup", data)
+						.post(`${PRODUCTION_SERVER}/user/signup`, data)
 						.then((response) => {
 							const success = response.data.success;
 							if (success === 0) {
@@ -96,7 +96,7 @@ const SignUp = ({ navigation }) => {
 							setError(true);
 							setErrorMessage("Failed creating account, please check your connection...");
 						});
-					
+
 					setLoadingMessage('Please wait...')
 					setShowLoadingModal(false)
 
@@ -111,51 +111,51 @@ const SignUp = ({ navigation }) => {
 	const [isModalVisible, setModalVisible] = useState(false);
 
 
-    const [shoot, setShoot] = useState(false);
+	const [shoot, setShoot] = useState(false);
 
-    useEffect(() => {
-      //Time out to fire the cannon
-      setTimeout(() => {
-        setShoot(true);
-      }, 1000);
-    }, []);
-  
+	useEffect(() => {
+		//Time out to fire the cannon
+		setTimeout(() => {
+			setShoot(true);
+		}, 1000);
+	}, []);
+
 
 	const handleLoginUser = async (email, password) => {
 		setModalVisible(false)
 		setShowLoadingModal(true)
 		setLoadingMessage('Logging in, please wait!...')
 
-			const data = {
-				email: email,
-				password: password,
-			};
-			await axios
-				.post("https://univtraze.herokuapp.com/api/user/login", data)
-				.then((response) => {
-					const success = response.data.success;
-	
-					if (success === 0) {
-						setError(true);
-						setErrorMessage(response.data.data);
-						setLoadingMessage('Login failed')
-						setShowLoadingModal(false)
-						
-					} else {
-						setError(false);
-						save("x-token", response.data.token);				
-						setLoadingMessage('Login successful')
-						setShowLoadingModal(false)
-						evaluateToken(response.data.token);
-					}
+		const data = {
+			email: email,
+			password: password,
+		};
+		await axios
+			.post(`${PRODUCTION_SERVER}/user/login`, data)
+			.then((response) => {
+				const success = response.data.success;
+
+				if (success === 0) {
+					setError(true);
+					setErrorMessage(response.data.data);
+					setLoadingMessage('Login failed')
+					setShowLoadingModal(false)
+
+				} else {
+					setError(false);
+					save("x-token", response.data.token);
+					setLoadingMessage('Login successful')
+					setShowLoadingModal(false)
+					evaluateToken(response.data.token);
+				}
 			});
-		
+
 	}
 
 	const evaluateToken = async (currentToken) => {
 		var decodedToken = jwtDecode(currentToken);
 
-		if(decodedToken.result.type === null || decodedToken.result.type === ''){
+		if (decodedToken.result.type === null || decodedToken.result.type === '') {
 			return navigation.navigate("SignUpUserType");
 		}
 
@@ -166,77 +166,77 @@ const SignUp = ({ navigation }) => {
 		navigation.navigate('TermsAndCondition')
 	}
 	return (
-		<SafeAreaView style={{height:'100%', backgroundColor:"#E1F5E4"}}>
-		<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content'/>
-		<KeyboardAvoidingView style={styles.container} behavior='height'>
-			<Modal
-				animationType="slide"
-				transparent={true}
-				visible={showLoadingModal}
-				onRequestClose={() => {
-				setShowLoadingModal(!showLoadingModal);
-				}}>
-				<View style={styles.centeredView}>
-				<View style={styles.modalView}>
-					<Image
-						source={require("../assets/loading_icon.gif")}
-						resizeMode="contain"
-						style={{ width: 100, height: 100 }}
+		<SafeAreaView style={{ height: '100%', backgroundColor: "#E1F5E4" }}>
+			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
+			<KeyboardAvoidingView style={styles.container} behavior='height'>
+				<Modal
+					animationType="slide"
+					transparent={true}
+					visible={showLoadingModal}
+					onRequestClose={() => {
+						setShowLoadingModal(!showLoadingModal);
+					}}>
+					<View style={styles.centeredView}>
+						<View style={styles.modalView}>
+							<Image
+								source={require("../assets/loading_icon.gif")}
+								resizeMode="contain"
+								style={{ width: 100, height: 100 }}
+							/>
+							<Text style={styles.modalText}>{loadingMessage}</Text>
+						</View>
+					</View>
+				</Modal>
+				<View style={styles.inputContainer}>
+					<Text style={styles.loginText}>Sign Up</Text>
+					<Text style={styles.label}>Email</Text>
+					<TextInput
+						placeholder="Email Address"
+						defaultValue={email}
+						onChangeText={(text) => setEmail(text)}
+						style={styles.input}
 					/>
-					<Text style={styles.modalText}>{loadingMessage}</Text>
+					<Text style={styles.label}>Password</Text>
+					<TextInput
+						placeholder="Password"
+						defaultValue={password}
+						onChangeText={(text) => setPassword(text)}
+						style={styles.input}
+						secureTextEntry
+					/>
+					<Text style={styles.label}>Confirm Password</Text>
+					<TextInput
+						placeholder="Confirm Password"
+						defaultValue={confirmPassword}
+						onChangeText={(text) => setConfirmPassword(text)}
+						style={styles.input}
+						secureTextEntry
+					/>
+
+					{error ? (
+						<Text style={styles.errorMessage}>*{errorMessage}</Text>
+					) : (
+						<Text style={styles.errorMessage}></Text>
+					)}
 				</View>
+				<View style={{ display: 'flex', flexDirection: 'row', paddingBottom: 5, paddingTop: 2 }}>
+					<Checkbox
+						value={agreeWithTermsAndCondition}
+						onValueChange={() => { setAgreeWithTermsAndCondition(!agreeWithTermsAndCondition) }}
+						style={{ marginRight: 5 }}
+					/>
+					<Text style={{ color: '#4d7861' }} onPress={() => { viewTermsAndConditions() }}>Agree with our Terms and conditions</Text>
 				</View>
-			</Modal>
-			<View style={styles.inputContainer}>
-				<Text style={styles.loginText}>Sign Up</Text>
-				<Text style={styles.label}>Email</Text>
-				<TextInput
-					placeholder="Email Address"
-					defaultValue={email}
-					onChangeText={(text) => setEmail(text)}
-					style={styles.input}
-				/>
-				<Text style={styles.label}>Password</Text>
-				<TextInput
-					placeholder="Password"
-					defaultValue={password}
-					onChangeText={(text) => setPassword(text)}
-					style={styles.input}
-					secureTextEntry
-				/>
-				<Text style={styles.label}>Confirm Password</Text>
-				<TextInput
-					placeholder="Confirm Password"
-					defaultValue={confirmPassword}
-					onChangeText={(text) => setConfirmPassword(text)}
-					style={styles.input}
-					secureTextEntry
-				/>
 
-				{error ? (
-					<Text style={styles.errorMessage}>*{errorMessage}</Text>
-				) : (
-					<Text style={styles.errorMessage}></Text>
-				)}
-			</View>
-			<View style={{display: 'flex', flexDirection: 'row', paddingBottom: 5, paddingTop: 2}}>
-			<Checkbox
-				value={agreeWithTermsAndCondition}
-				onValueChange={() => {setAgreeWithTermsAndCondition(!agreeWithTermsAndCondition)}}
-				style={{marginRight: 5}}
-			/>
-				<Text style={{color: '#4d7861'}} onPress={() => {viewTermsAndConditions()}}>Agree with our Terms and conditions</Text>
-			</View>
+				<View style={styles.buttonContainer}>
+					<TouchableOpacity
+						onPress={() => validateUserInput()}
+						style={styles.button}
+					>
+						<Text style={styles.buttonText}>Sign Up</Text>
+					</TouchableOpacity>
 
-			<View style={styles.buttonContainer}>
-				<TouchableOpacity
-					onPress={() => validateUserInput()}
-					style={styles.button}
-				>
-					<Text style={styles.buttonText}>Sign Up</Text>
-				</TouchableOpacity>
-
-				{/* <Text style={styles.orText}>or</Text>
+					{/* <Text style={styles.orText}>or</Text>
 				
 				<View style={styles.socialMediaContainer}>
 					<TouchableOpacity onPress={() => {}}>
@@ -248,27 +248,27 @@ const SignUp = ({ navigation }) => {
 					</TouchableOpacity>
 				</View> */}
 
-				<ModalSuccess isVisible={isModalVisible}>
-                        <View style={{ width: 348, height: 227, backgroundColor: 'white', alignSelf: 'center', alignItems: 'center',paddingVertical:20, borderRadius:15}}>
+					<ModalSuccess isVisible={isModalVisible}>
+						<View style={{ width: 348, height: 227, backgroundColor: 'white', alignSelf: 'center', alignItems: 'center', paddingVertical: 20, borderRadius: 15 }}>
 
-                            <Text style={{ fontSize: 28, fontWeight: '700', color: '#29CC42' }}>   Sign Up {'\n'}Successful</Text>
-                            <Text style={{ fontSize: 14, fontWeight: '400', color: '#364D39' ,lineHeight:19.5 }}> Awesome, you will now being {'\n'} redirected to user profiling area</Text>
-							
-                            <TouchableOpacity style={styles.buttonContinue} 
+							<Text style={{ fontSize: 28, fontWeight: '700', color: '#29CC42' }}>   Sign Up {'\n'}Successful</Text>
+							<Text style={{ fontSize: 14, fontWeight: '400', color: '#364D39', lineHeight: 19.5 }}> Awesome, you will now being {'\n'} redirected to user profiling area</Text>
+
+							<TouchableOpacity style={styles.buttonContinue}
 								onPress={() => {
 									handleLoginUser(email, confirmPassword)
 								}} >
-                            <Text style={styles.buttonText}>Continue</Text>
-                            </TouchableOpacity>
-                          
-                        </View>
-                        {shoot ? (
-                                <ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut='true' />
-                            ) : null}
-                    </ModalSuccess>
+								<Text style={styles.buttonText}>Continue</Text>
+							</TouchableOpacity>
 
-			</View>
-		</KeyboardAvoidingView>
+						</View>
+						{shoot ? (
+							<ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut='true' />
+						) : null}
+					</ModalSuccess>
+
+				</View>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 };
@@ -284,8 +284,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-	  },
-	  modalView: {
+	},
+	modalView: {
 		width: '80%',
 		margin: 20,
 		backgroundColor: 'white',
@@ -294,37 +294,37 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: {
-		  width: 0,
-		  height: 2,
+			width: 0,
+			height: 2,
 		},
 		shadowOpacity: 0.25,
 		shadowRadius: 4,
 		elevation: 5,
-	  },
-	  buttonContainer: {
+	},
+	buttonContainer: {
 		backgroundColor: "transparent",
-	  },
-	  button: {
+	},
+	button: {
 		borderRadius: 20,
 		padding: 10,
 		elevation: 2,
-	  },
-	  buttonOpen: {
+	},
+	buttonOpen: {
 		backgroundColor: '#F194FF',
-	  },
-	  buttonClose: {
+	},
+	buttonClose: {
 		backgroundColor: '#2196F3',
-	  },
-	  textStyle: {
+	},
+	textStyle: {
 		color: 'white',
 		fontWeight: 'bold',
 		textAlign: 'center',
-	  },
-	  modalText: {
+	},
+	modalText: {
 		marginBottom: 15,
 		textAlign: 'center',
 		color: "#4d7861"
-	  },
+	},
 	image: {
 		justifyContent: "center",
 		width: "100%",
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		backgroundColor: "transparent"
-	},	
+	},
 	button: {
 		backgroundColor: "#28CD41",
 		padding: 10,
@@ -432,14 +432,14 @@ const styles = StyleSheet.create({
 		marginLeft: 41,
 		color: "red",
 		paddingVertical: 7.5,
-	},buttonContinue:{
-        backgroundColor: "#28CD41",
-        padding: 10,
-        borderRadius: 10,
-        paddingVertical: 18,
-        marginVertical:15,
-        width: 308,
-        height: 60,
-    }
+	}, buttonContinue: {
+		backgroundColor: "#28CD41",
+		padding: 10,
+		borderRadius: 10,
+		paddingVertical: 18,
+		marginVertical: 15,
+		width: 308,
+		height: 60,
+	}
 
 });

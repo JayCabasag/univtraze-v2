@@ -25,7 +25,7 @@ import { useToast } from "react-native-toast-notifications";
 import * as ImagePicker from 'expo-image-picker';
 
 
-const UpdatePersonalInfo = ({ navigation, route}) => {
+const UpdatePersonalInfo = ({ navigation, route }) => {
 
 	const toast = useToast()
 	// console.log(route.params.token)
@@ -52,7 +52,7 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 	const [success, setSuccess] = useState(false)
 	const [successMessage, setSuccessMessage] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
-	
+
 	//Image handlers
 	const [profilePhoto, setProfilePhoto] = useState(null)
 	const [base64ProfilePhoto, setBase64ProfilePhoto] = useState('')
@@ -60,9 +60,9 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 
 
 	useEffect(() => {
-		handleGetUserDetails()	
+		handleGetUserDetails()
 	}, [])
-	
+
 	const handleGetUserDetails = async () => {
 		setIsLoading(true)
 		setError(false)
@@ -70,59 +70,59 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 		const config = {
 			headers: { Authorization: `Bearer ${token}` }
 		};
-			
-		const data = {   
+
+		const data = {
 			id: userId
 		}
 
 		try {
-			await axios.post(`https://univtraze.herokuapp.com/api/user/getUserDetailsById`, data, config)
-			.then((response) => {
-				if(response.data.success === 0){
-					setError(true)
-					setErrorMessage(response.data.message)
+			await axios.post(`${PRODUCTION_SERVER}/user/getUserDetailsById`, data, config)
+				.then((response) => {
+					if (response.data.success === 0) {
+						setError(true)
+						setErrorMessage(response.data.message)
+						setIsLoading(false)
+						setSuccess(false)
+						return
+					}
+
+					setError(false)
+					setErrorMessage('')
 					setIsLoading(false)
 					setSuccess(false)
-					return
-				}
 
-				setError(false)
-				setErrorMessage('')
-				setIsLoading(false)
-				setSuccess(false)
-				
-				setUserData(response.data.data)
+					setUserData(response.data.data)
 
-				// This is where I assign all data from the database to the available fields. 
+					// This is where I assign all data from the database to the available fields. 
 
-				console.log(response.data)
+					console.log(response.data)
 
-				if(response.data.data.profile_url !== undefined){
-					setProfilePhoto({uri: response.data.data.profile_url})
-					setCurrenProfilePhotoUri(response.data.data.profile_url)
-				}
+					if (response.data.data.profile_url !== undefined) {
+						setProfilePhoto({ uri: response.data.data.profile_url })
+						setCurrenProfilePhotoUri(response.data.data.profile_url)
+					}
 
-				if(response.data.data.mobile_number !== undefined){
-					setMobileNumber(response.data.data.mobile_number)
-				}
+					if (response.data.data.mobile_number !== undefined) {
+						setMobileNumber(response.data.data.mobile_number)
+					}
 
-				if(response.data.data.year_section !== undefined){
-					setStudentYearSection(response.data.data.year_section)
-				}
+					if (response.data.data.year_section !== undefined) {
+						setStudentYearSection(response.data.data.year_section)
+					}
 
-				if(response.data.data.course !== undefined){
-					setStudentCourse(response.data.data.course)
-				}
+					if (response.data.data.course !== undefined) {
+						setStudentCourse(response.data.data.course)
+					}
 
-				if(response.data.data.department !== undefined){
-					setEmployeeDepartment(response.data.data.department)
-				}
+					if (response.data.data.department !== undefined) {
+						setEmployeeDepartment(response.data.data.department)
+					}
 
-				if(response.data.data.position !== undefined){
-					setEmployeePosition(response.data.data.position)
-				}
+					if (response.data.data.position !== undefined) {
+						setEmployeePosition(response.data.data.position)
+					}
 
-			});
+				});
 		} catch (error) {
 			setError(true)
 			setErrorMessage('Network connection error')
@@ -138,18 +138,18 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 			allowsEditing: true,
 			base64: true,
 			quality: 1,
-		  });
-	  
+		});
+
 		if (!result.cancelled) {
 			setProfilePhoto(result);
-		  }
+		}
 
 		const convertedBase64Img = "data:image/jpeg;base64," + result.base64
 		setBase64ProfilePhoto(convertedBase64Img)
 	};
 
 	const handleUpdateProfileData = async () => {
-		if(profilePhoto.uri !== currenProfilePhotoUri){
+		if (profilePhoto.uri !== currenProfilePhotoUri) {
 			handleUploadNewPhoto()
 			return
 		}
@@ -161,22 +161,22 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 		setError(false)
 		setSuccess(false)
 		setIsLoading(true)
-		await axios.post('https://univtraze.herokuapp.com/api/files/uploadUserBase64Image', {
-					image: base64ProfilePhoto,
-				})
-				.then(function (response) {
-					setError(false)
-					setSuccess(false)
-					setIsLoading(false)
-					setProfilePhoto({uri: response.data.results.url})
-					updatePersonalInfo()
-				})
-				.catch(function (error) {
-					setError(false)
-					setSuccess(false)
-					setIsLoading(false)
-					alert("Error occured while uploading your profile photo")
-				});
+		await axios.post(`${PRODUCTION_SERVER}/files/uploadUserBase64Image`, {
+			image: base64ProfilePhoto,
+		})
+			.then(function (response) {
+				setError(false)
+				setSuccess(false)
+				setIsLoading(false)
+				setProfilePhoto({ uri: response.data.results.url })
+				updatePersonalInfo()
+			})
+			.catch(function (error) {
+				setError(false)
+				setSuccess(false)
+				setIsLoading(false)
+				alert("Error occured while uploading your profile photo")
+			});
 	}
 
 
@@ -187,8 +187,8 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 		const config = {
 			headers: { Authorization: `Bearer ${token}` }
 		};
-			
-		const data = {   
+
+		const data = {
 			user_id: userId * 1,
 			type: userType,
 			profile_url: profilePhoto.uri,
@@ -200,23 +200,23 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 		}
 
 		try {
-			await axios.post(`https://univtraze.herokuapp.com/api/user/updatePersonalInfo`, data, config)
-			.then((response) => {
-				if(response.data.success === 0){
-					setError(true)
-					setErrorMessage(response.data.message)
-					setIsLoading(false)
-					setSuccess(false)
-					return
-				}
+			await axios.post(`${PRODUCTION_SERVER}/user/updatePersonalInfo`, data, config)
+				.then((response) => {
+					if (response.data.success === 0) {
+						setError(true)
+						setErrorMessage(response.data.message)
+						setIsLoading(false)
+						setSuccess(false)
+						return
+					}
 
-				setError(false)
-				setErrorMessage('')
-				setIsLoading(false)
-				setSuccessMessage(response.data.message)
-				setSuccess(true)
-				
-			});
+					setError(false)
+					setErrorMessage('')
+					setIsLoading(false)
+					setSuccessMessage(response.data.message)
+					setSuccess(true)
+
+				});
 		} catch (error) {
 			setError(true)
 			setErrorMessage('Network connection error')
@@ -229,10 +229,10 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 		<SafeAreaView>
 			<StatusBar animated={true} backgroundColor="#E1F5E4" />
 			<View style={styles.container}>
-				
+
 				<View style={styles.topContainer}>
 					<View style={styles.backIcon}>
-						<TouchableWithoutFeedback onPress={() => {navigation.goBack()}}>
+						<TouchableWithoutFeedback onPress={() => { navigation.goBack() }}>
 							<ImageBackground
 								source={require("../assets/back-icon.png")}
 								resizeMode="contain"
@@ -247,85 +247,85 @@ const UpdatePersonalInfo = ({ navigation, route}) => {
 				<View style={styles.bodyContainer}>
 					<Text style={styles.headerText}>Update Personal Information</Text>
 					<ScrollView>
-					<Text style={{color: '#28CD41'}}>Only limited information can be updated in this section. Personal information e.g. Name, Address and Date of Birth cannot be updated here, please contact adminitrator for further assistance.</Text>
-					
-								<Image
-									source={{uri : profilePhoto === null? "https://media.istockphoto.com/vectors/user-member-vector-icon-for-ui-user-interface-or-profile-face-avatar-vector-id1130884625?k=20&m=1130884625&s=612x612&w=0&h=OITK5Otm_lRj7Cx8mBhm7NtLTEHvp6v3XnZFLZmuB9o=" : profilePhoto.uri}}
-									resizeMode="cover"
-									style={{
-									width: 120,
-									height: 120,
-									borderRadius: 100,
-									borderColor: "#28CD41",
-									borderWidth: 2,
-									shadowColor: "black",
-									alignSelf: 'center'
-								  }}
-								/>
+						<Text style={{ color: '#28CD41' }}>Only limited information can be updated in this section. Personal information e.g. Name, Address and Date of Birth cannot be updated here, please contact adminitrator for further assistance.</Text>
+
+						<Image
+							source={{ uri: profilePhoto === null ? "https://media.istockphoto.com/vectors/user-member-vector-icon-for-ui-user-interface-or-profile-face-avatar-vector-id1130884625?k=20&m=1130884625&s=612x612&w=0&h=OITK5Otm_lRj7Cx8mBhm7NtLTEHvp6v3XnZFLZmuB9o=" : profilePhoto.uri }}
+							resizeMode="cover"
+							style={{
+								width: 120,
+								height: 120,
+								borderRadius: 100,
+								borderColor: "#28CD41",
+								borderWidth: 2,
+								shadowColor: "black",
+								alignSelf: 'center'
+							}}
+						/>
 						<TouchableOpacity style={styles.editProfileButton} onPress={() => handlePickProfilePhoto()}>
-							<AntDesign name="edit" size={24} color="black"/>
+							<AntDesign name="edit" size={24} color="black" />
 							<Text> EDIT PROFILE </Text>
 						</TouchableOpacity>
 
-							<View>
-								<Text>User Id.</Text>
-								<TextInput placeholder="Id" style={styles.inputDisabled} value={userId + ""} editable={false}/>
-								<Text>User Type</Text>
-								<TextInput placeholder="Type" style={styles.inputDisabled} value={userType} editable={false}/>
-								<Text>Mobile No.</Text>
-								<TextInput placeholder="Type" style={styles.input} defaultValue={mobileNumber} onChangeText={(text) => setMobileNumber(text)}/>
-							</View>
-						
+						<View>
+							<Text>User Id.</Text>
+							<TextInput placeholder="Id" style={styles.inputDisabled} value={userId + ""} editable={false} />
+							<Text>User Type</Text>
+							<TextInput placeholder="Type" style={styles.inputDisabled} value={userType} editable={false} />
+							<Text>Mobile No.</Text>
+							<TextInput placeholder="Type" style={styles.input} defaultValue={mobileNumber} onChangeText={(text) => setMobileNumber(text)} />
+						</View>
+
 						{/* This is for Student only */}
 						{
-							userType === 'Student'?
-							<View>
-								<Text>Course</Text>
-								<TextInput placeholder="Course" style={styles.input} defaultValue={studentCourse} onChangeText={(text) => setStudentCourse(text)}/>
-								<Text>Year and Section</Text>
-								<TextInput placeholder="Year and Section" style={styles.input} defaultValue={studentYearSection} onChangeText={(text) => setStudentYearSection(text)}/>
-							</View>
-							:
-							null
+							userType === 'Student' ?
+								<View>
+									<Text>Course</Text>
+									<TextInput placeholder="Course" style={styles.input} defaultValue={studentCourse} onChangeText={(text) => setStudentCourse(text)} />
+									<Text>Year and Section</Text>
+									<TextInput placeholder="Year and Section" style={styles.input} defaultValue={studentYearSection} onChangeText={(text) => setStudentYearSection(text)} />
+								</View>
+								:
+								null
 						}
-						
-						
+
+
 						{/* This is for Employee only */}
 						{
-							userType === 'Employee'?
-							<View>
-								<Text>Department/Faculty</Text>
-								<TextInput placeholder="Department/Faculty" style={styles.input} defaultValue={employeeDepartment} onChangeText={(text) => setEmployeeDepartment(text)}/>
-								<Text>Position</Text>
-								<TextInput placeholder="Position" style={styles.input} defaultValue={employeePosition} onChangeText={(text) => setEmployeePosition(text)}/>
-							</View>
-							:
-							null
+							userType === 'Employee' ?
+								<View>
+									<Text>Department/Faculty</Text>
+									<TextInput placeholder="Department/Faculty" style={styles.input} defaultValue={employeeDepartment} onChangeText={(text) => setEmployeeDepartment(text)} />
+									<Text>Position</Text>
+									<TextInput placeholder="Position" style={styles.input} defaultValue={employeePosition} onChangeText={(text) => setEmployeePosition(text)} />
+								</View>
+								:
+								null
 						}
-					
+
 					</ScrollView>
 
-					
+
 					{
-						error?
-						<Text style={{color: 'red'}}>{errorMessage}</Text>
-						:
-						null
+						error ?
+							<Text style={{ color: 'red' }}>{errorMessage}</Text>
+							:
+							null
 					}
 					{
-						success?
-						<Text style={{color: '#28CD41'}}>{successMessage}</Text>
-						:
-						null
+						success ?
+							<Text style={{ color: '#28CD41' }}>{successMessage}</Text>
+							:
+							null
 					}
 					{
-						isLoading?
-						<Text style={{color: '#28CD41'}}>Please wait ...</Text>
-						:
-						null
+						isLoading ?
+							<Text style={{ color: '#28CD41' }}>Please wait ...</Text>
+							:
+							null
 					}
 					<TouchableOpacity style={styles.buttons} onPress={() => handleUpdateProfileData()}>
-						<Text style={{fontSize: 15, color: 'white'}}>Update info</Text>
+						<Text style={{ fontSize: 15, color: 'white' }}>Update info</Text>
 					</TouchableOpacity>
 				</View>
 			</View>
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
 		width: 60,
 		marginLeft: -15,
 		justifyContent: "center",
-		
+
 	},
 	image: {
 		width: "100%",
@@ -396,9 +396,9 @@ const styles = StyleSheet.create({
 		backgroundColor: "#28CD41",
 	},
 	editProfileButton: {
-		alignSelf: 'center', 
-		alignItems: 'center', 
-		display: 'flex', 
+		alignSelf: 'center',
+		alignItems: 'center',
+		display: 'flex',
 		flexDirection: 'row'
 	},
 	modalButton: {
@@ -454,12 +454,12 @@ const styles = StyleSheet.create({
 	},
 	deactivateButton: {
 		height: 35,
-		justifyContent: 'center', 
+		justifyContent: 'center',
 		alignSelf: 'center',
-	    backgroundColor: 'red', 
+		backgroundColor: 'red',
 		alignItems: 'center',
-		borderRadius: 5, 
-		paddingHorizontal: 10, 
+		borderRadius: 5,
+		paddingHorizontal: 10,
 		marginTop: 15
 	},
 	deactivateButtonText: {
@@ -468,26 +468,26 @@ const styles = StyleSheet.create({
 	},
 	cancelButton: {
 		height: 35,
-		justifyContent: 'center', 
+		justifyContent: 'center',
 		alignSelf: 'center',
-	    backgroundColor: 'white',
-		borderWidth: 1, 
+		backgroundColor: 'white',
+		borderWidth: 1,
 		alignItems: 'center',
-		borderRadius: 5, 
-		paddingHorizontal: 10, 
+		borderRadius: 5,
+		paddingHorizontal: 10,
 		marginTop: 15
 	},
 	cancelButtonText: {
 		color: 'black',
 		fontSize: 15
-	}, 
-	settingsOption: 
+	},
+	settingsOption:
 	{
-		width: '100%', 
-		height: 50, 
+		width: '100%',
+		height: 50,
 		justifyContent: 'space-between',
-		alignItems: 'center', 
-		display: 'flex', 
+		alignItems: 'center',
+		display: 'flex',
 		flexDirection: 'row',
 	},
 	headerText: {

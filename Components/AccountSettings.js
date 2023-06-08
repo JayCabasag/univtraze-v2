@@ -24,9 +24,9 @@ import { AntDesign } from '@expo/vector-icons';
 import { useToast } from "react-native-toast-notifications";
 
 
-const AccountSettings = ({ navigation, route: {params}}) => {
-	
-	
+const AccountSettings = ({ navigation, route: { params } }) => {
+
+
 	const toast = useToast()
 
 	const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -43,7 +43,7 @@ const AccountSettings = ({ navigation, route: {params}}) => {
 	const [errorMessage, setErrorMessage] = useState('Error')
 
 	const deleteAccountPermanently = async (currentToken, id) => {
-		if(password === ''){
+		if (password === '') {
 			setError(true)
 			setErrorMessage('Please input your password.')
 			return
@@ -52,50 +52,50 @@ const AccountSettings = ({ navigation, route: {params}}) => {
 		const config = {
 			headers: { Authorization: `Bearer ${currentToken}` }
 		};
-			
-		const data = {   
+
+		const data = {
 			id: id,
 			password: password
-			  
+
 		}
 
 		setIsLoading(true)
 		setError(false)
-		
+
 		try {
-			await axios.post(`https://univtraze.herokuapp.com/api/user/deactivateAccount`, data, config)
-			.then((response) => {
-				
-			const success = response.data.success;
+			await axios.post(`${PRODUCTION_SERVER}/user/deactivateAccount`, data, config)
+				.then((response) => {
 
-			if(success === 0){
-				setIsLoading(false)
-				setError(true)
-				setErrorMessage(response.data.message)
-				return 
-			}
+					const success = response.data.success;
 
-			if(success === 1){
-				setIsLoading(false)
-				setError(false)
-				navigation.navigate('Login')
-				toast.show("Account deactivated...", {
-					type: "normal",
-					placement: "bottom",
-					duration: 1000,
-					offset: 30,
-					animationType: "slide-in",
-				  });
-				return
-			}
+					if (success === 0) {
+						setIsLoading(false)
+						setError(true)
+						setErrorMessage(response.data.message)
+						return
+					}
 
-			});
+					if (success === 1) {
+						setIsLoading(false)
+						setError(false)
+						navigation.navigate('Login')
+						toast.show("Account deactivated...", {
+							type: "normal",
+							placement: "bottom",
+							duration: 1000,
+							offset: 30,
+							animationType: "slide-in",
+						});
+						return
+					}
+
+				});
 		} catch (error) {
 			setIsLoading(false)
 			setError(true)
 			setErrorMessage('Network error')
 		}
-		
+
 	}
 
 	useEffect(() => {
@@ -128,43 +128,43 @@ const AccountSettings = ({ navigation, route: {params}}) => {
 					transparent={true}
 					visible={showPasswordModal}
 					onRequestClose={() => {
-					setShowPasswordModal(!showPasswordModal);
+						setShowPasswordModal(!showPasswordModal);
 					}}>
 					<View style={styles.centeredView}>
-					<View style={styles.modalView}>
-						<Text style={{color: 'red'}}>*Once account is deleted it can no longer be retrieved.</Text>
-						<TextInput
-							placeholder="Password"
-							defaultValue={""}
-							onChangeText={(text) => {
-								setPassword(text);
-							}}
-							secureTextEntry
-							style={styles.input}
-						/>
-						{
-							error?
-							<Text style={{color: 'red'}}>{errorMessage}</Text>
-							: 
-							isLoading?
-							<Text style={{color: '#28CD41'}}>Please wait ...</Text>
-							:
-							null
-						}
-						<View style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-							<TouchableOpacity style={styles.deactivateButton} onPress={() => {deleteAccountPermanently(token, userId)}}>
-								<Text style={styles.deactivateButtonText}>Deactivate</Text>
-							</TouchableOpacity>
-							<TouchableOpacity style={styles.cancelButton} onPress={() => {setShowPasswordModal(false)}}>
-								<Text style={styles.cancelButtonText}>Cancel</Text>
-							</TouchableOpacity>
+						<View style={styles.modalView}>
+							<Text style={{ color: 'red' }}>*Once account is deleted it can no longer be retrieved.</Text>
+							<TextInput
+								placeholder="Password"
+								defaultValue={""}
+								onChangeText={(text) => {
+									setPassword(text);
+								}}
+								secureTextEntry
+								style={styles.input}
+							/>
+							{
+								error ?
+									<Text style={{ color: 'red' }}>{errorMessage}</Text>
+									:
+									isLoading ?
+										<Text style={{ color: '#28CD41' }}>Please wait ...</Text>
+										:
+										null
+							}
+							<View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+								<TouchableOpacity style={styles.deactivateButton} onPress={() => { deleteAccountPermanently(token, userId) }}>
+									<Text style={styles.deactivateButtonText}>Deactivate</Text>
+								</TouchableOpacity>
+								<TouchableOpacity style={styles.cancelButton} onPress={() => { setShowPasswordModal(false) }}>
+									<Text style={styles.cancelButtonText}>Cancel</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
-					</View>
 					</View>
 				</Modal>
 				<View style={styles.topContainer}>
 					<View style={styles.backIcon}>
-						<TouchableWithoutFeedback onPress={() => {navigation.goBack()}}>
+						<TouchableWithoutFeedback onPress={() => { navigation.goBack() }}>
 							<ImageBackground
 								source={require("../assets/back-icon.png")}
 								resizeMode="contain"
@@ -177,15 +177,15 @@ const AccountSettings = ({ navigation, route: {params}}) => {
 
 				{/*End  Notification View */}
 				<View style={styles.bodyContainer}>
-					<TouchableOpacity style={styles.settingsOption} onPress={() => {navigation.navigate('UpdatePersonalInfo', {id: params.id, type: params.type, token: token})}}>
-						<Text style={{fontSize: 15}}>Update Personal Information</Text>
+					<TouchableOpacity style={styles.settingsOption} onPress={() => { navigation.navigate('UpdatePersonalInfo', { id: params.id, type: params.type, token: token }) }}>
+						<Text style={{ fontSize: 15 }}>Update Personal Information</Text>
 						<AntDesign name="right" size={15} color="black" />
 					</TouchableOpacity>
-					<TouchableOpacity style={styles.settingsOption} onPress={() => {navigation.navigate('UpdatePassword', {id: params.id, type: params.type, token: token})}}>
-						<Text  style={{fontSize: 15}}>Update Password</Text>
+					<TouchableOpacity style={styles.settingsOption} onPress={() => { navigation.navigate('UpdatePassword', { id: params.id, type: params.type, token: token }) }}>
+						<Text style={{ fontSize: 15 }}>Update Password</Text>
 						<AntDesign name="right" size={15} color="black" />
 					</TouchableOpacity>
-					<TouchableOpacity style={styles.deactivateButton} onPress={() => {setShowPasswordModal(true)}}>
+					<TouchableOpacity style={styles.deactivateButton} onPress={() => { setShowPasswordModal(true) }}>
 						<Text style={styles.deactivateButtonText}>Deactivate Account</Text>
 					</TouchableOpacity>
 				</View>
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
 		width: 60,
 		marginLeft: -15,
 		justifyContent: "center",
-		
+
 	},
 	image: {
 		width: "100%",
@@ -292,12 +292,12 @@ const styles = StyleSheet.create({
 	},
 	deactivateButton: {
 		height: 35,
-		justifyContent: 'center', 
+		justifyContent: 'center',
 		alignSelf: 'center',
-	    backgroundColor: 'red', 
+		backgroundColor: 'red',
 		alignItems: 'center',
-		borderRadius: 5, 
-		paddingHorizontal: 10, 
+		borderRadius: 5,
+		paddingHorizontal: 10,
 		marginTop: 15
 	},
 	deactivateButtonText: {
@@ -306,26 +306,26 @@ const styles = StyleSheet.create({
 	},
 	cancelButton: {
 		height: 35,
-		justifyContent: 'center', 
+		justifyContent: 'center',
 		alignSelf: 'center',
-	    backgroundColor: 'white',
-		borderWidth: 1, 
+		backgroundColor: 'white',
+		borderWidth: 1,
 		alignItems: 'center',
-		borderRadius: 5, 
-		paddingHorizontal: 10, 
+		borderRadius: 5,
+		paddingHorizontal: 10,
 		marginTop: 15
 	},
 	cancelButtonText: {
 		color: 'black',
 		fontSize: 15
-	}, 
-	settingsOption: 
+	},
+	settingsOption:
 	{
-		width: '100%', 
-		height: 50, 
+		width: '100%',
+		height: 50,
 		justifyContent: 'space-between',
-		alignItems: 'center', 
-		display: 'flex', 
+		alignItems: 'center',
+		display: 'flex',
 		flexDirection: 'row',
 	}
 });

@@ -102,7 +102,7 @@ const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 		var proofDocUrl = '';
 		setShowLoadingModal(true)
 		setLoadingMessage('Please wait while uploading your document.')
-		await axios.post('https://univtraze.herokuapp.com/api/files/uploadUserBase64Image', {
+		await axios.post(`${PRODUCTION_SERVER}/files/uploadUserBase64Image`, {
 			image: base64ProofDoc,
 		})
 			.then(function (response) {
@@ -136,7 +136,7 @@ const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 			document_proof_image: proofDocUrl
 		}
 
-		await axios.post(`https://univtraze.herokuapp.com/api/covid_cases/addCommunicableDiseaseCase`, data, config)
+		await axios.post(`${PRODUCTION_SERVER}/covid_cases/addCommunicableDiseaseCase`, data, config)
 			.then((response) => {
 				const success = response.data.success;
 

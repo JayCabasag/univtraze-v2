@@ -6,7 +6,7 @@ import {
 	View,
 	TouchableOpacity,
 	Text,
-	Alert,StatusBar, Modal, Dimensions
+	Alert, StatusBar, Modal, Dimensions
 } from "react-native";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../AuthContext/AuthContext";
@@ -14,6 +14,7 @@ import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PRODUCTION_SERVER } from "../services/configs";
 
 const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
@@ -38,7 +39,7 @@ const Login = ({ navigation }) => {
 	const [passwordInput, setPasswordInput] = useState("");
 
 
-	
+
 	//Variables for loading
 
 	const [showLoadingModal, setShowLoadingModal] = useState(false)
@@ -68,17 +69,15 @@ const Login = ({ navigation }) => {
 					setError(true);
 					setErrorMessage("Password field Minimum of 8 characters");
 				} else {
-					//Data checking with api
-
 					const data = {
 						email: emailInput,
 						password: passwordInput,
 					};
 					await axios
-						.post("https://univtraze.herokuapp.com/api/user/login", data)
+						.post(`${PRODUCTION_SERVER}/user/login`, data)
 						.then((response) => {
 							const success = response.data.success;
-
+							console.log(response)
 							if (success === 0) {
 								setError(true);
 								setErrorMessage(response.data.data);
@@ -88,10 +87,13 @@ const Login = ({ navigation }) => {
 								save("x-token", response.data.token);
 								setEmailInput("");
 								setPasswordInput("");
-							
 								evaluateToken(response.data.token);
 							}
-					});
+						}).catch((error) => {
+							console.log(error)
+						}).finally(() => {
+							setShowLoadingModal(false)
+						})
 				}
 			} else {
 				setError(true);
@@ -105,7 +107,7 @@ const Login = ({ navigation }) => {
 	const evaluateToken = (currentToken) => {
 		var decodedToken = jwtDecode(currentToken);
 
-		if(decodedToken.result.type === null || decodedToken.result.type === ''){
+		if (decodedToken.result.type === null || decodedToken.result.type === '') {
 			return navigation.navigate("SignUpUserType");
 		}
 
@@ -113,15 +115,15 @@ const Login = ({ navigation }) => {
 	}
 
 	return (
-			<SafeAreaView style = {{backgroundColor :"#E1F5E4"}}>
-				<Modal
-					animationType="fade"
-					transparent={true}
-					visible={showLoadingModal}
-					onRequestClose={() => {
+		<SafeAreaView style={{ backgroundColor: "#E1F5E4" }}>
+			<Modal
+				animationType="fade"
+				transparent={true}
+				visible={showLoadingModal}
+				onRequestClose={() => {
 					setShowLoadingModal(!showLoadingModal);
-					}}>
-					<View style={styles.centeredView}>
+				}}>
+				<View style={styles.centeredView}>
 					<View style={styles.modalView}>
 						<Image
 							source={require("../assets/loading_icon.gif")}
@@ -130,58 +132,58 @@ const Login = ({ navigation }) => {
 						/>
 						<Text style={styles.modalText}>{loadingMessage}</Text>
 					</View>
-					</View>
-				</Modal>
-				
-			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content'/>
+				</View>
+			</Modal>
+
+			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
 			<KeyboardAvoidingView style={styles.container} behavior="height">
-			<View style={styles.imageContainer}>
-				<Image style={styles.image} source={image} />
-			</View>
-			
-			<Text style={styles.loginText}>Log in</Text>
-			
-			<View style={styles.inputContainer}>
-				<Text style={styles.label}>Email</Text>
-				<TextInput
-					placeholder="Email Address"
-					defaultValue={emailInput}
-					onChangeText={(text) => {
-						setEmailInput(text);
-					}}
-					style={styles.input}
-				/>
+				<View style={styles.imageContainer}>
+					<Image style={styles.image} source={image} />
+				</View>
 
-				<Text style={styles.label}>Password</Text>
-				<TextInput
-					placeholder="Password"
-					defaultValue={passwordInput}
-					onChangeText={(text) => {
-						setPasswordInput(text);
-					}}
-					style={styles.input}
-					secureTextEntry
-				/>
+				<Text style={styles.loginText}>Log in</Text>
 
-				{error ? (
-					<Text style={styles.errorMessage}>*{errorMessage}</Text>
-				) : (
-					<Text style={styles.errorMessage}></Text>
-				)}
+				<View style={styles.inputContainer}>
+					<Text style={styles.label}>Email</Text>
+					<TextInput
+						placeholder="Email Address"
+						defaultValue={emailInput}
+						onChangeText={(text) => {
+							setEmailInput(text);
+						}}
+						style={styles.input}
+					/>
 
-				<Text style={styles.forgotPassword} onPress={() => {
-					navigation.navigate('ForgotPassword')
-				}}>Forgot Password?</Text>
-			</View>
+					<Text style={styles.label}>Password</Text>
+					<TextInput
+						placeholder="Password"
+						defaultValue={passwordInput}
+						onChangeText={(text) => {
+							setPasswordInput(text);
+						}}
+						style={styles.input}
+						secureTextEntry
+					/>
 
-			<View style={styles.buttonContainer}>
-			{/* onPress={() =>navigation.navigate("Dashboard")} */}
-				<TouchableOpacity  onPress={() =>  loginNow()	} style={styles.button}>
-					<Text style={styles.buttonText}>Log in</Text>
-				</TouchableOpacity>
-			</View>
+					{error ? (
+						<Text style={styles.errorMessage}>*{errorMessage}</Text>
+					) : (
+						<Text style={styles.errorMessage}></Text>
+					)}
 
-			{/* <Text style={styles.orText}>or</Text>
+					<Text style={styles.forgotPassword} onPress={() => {
+						navigation.navigate('ForgotPassword')
+					}}>Forgot Password?</Text>
+				</View>
+
+				<View style={styles.buttonContainer}>
+					{/* onPress={() =>navigation.navigate("Dashboard")} */}
+					<TouchableOpacity onPress={() => loginNow()} style={styles.button}>
+						<Text style={styles.buttonText}>Log in</Text>
+					</TouchableOpacity>
+				</View>
+
+				{/* <Text style={styles.orText}>or</Text>
 
 			<View style={styles.socialMediaContainer}>
 				<TouchableOpacity onPress={() => {}}>
@@ -193,9 +195,9 @@ const Login = ({ navigation }) => {
 				</TouchableOpacity>
 			</View> */}
 			</KeyboardAvoidingView>
-			</SafeAreaView>
-		
-	
+		</SafeAreaView>
+
+
 	);
 };
 
@@ -218,10 +220,10 @@ const styles = StyleSheet.create({
 	},
 
 	container: {
-		height:'100%',
+		height: '100%',
 		justifyContent: "center",
 		alignItems: "center",
-	
+
 	},
 	inputContainer: {
 		marginTop: 10
@@ -318,8 +320,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-	  },
-	  modalView: {
+	},
+	modalView: {
 		width: '80%',
 		margin: 20,
 		backgroundColor: 'white',
@@ -328,26 +330,26 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		shadowColor: '#000',
 		shadowOffset: {
-		  width: 0,
-		  height: 2,
+			width: 0,
+			height: 2,
 		},
 		shadowOpacity: 0.25,
 		shadowRadius: 4,
 		elevation: 5,
-	  },
-		buttonOpen: {
+	},
+	buttonOpen: {
 		backgroundColor: '#F194FF',
-	  },
-	  buttonClose: {
+	},
+	buttonClose: {
 		backgroundColor: '#2196F3',
-	  },
-	  textStyle: {
+	},
+	textStyle: {
 		color: 'white',
 		fontWeight: 'bold',
 		textAlign: 'center',
-	  },
-	  modalText: {
+	},
+	modalText: {
 		marginBottom: 15,
 		textAlign: 'center',
-	  },
+	},
 });
