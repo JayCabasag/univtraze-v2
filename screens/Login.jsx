@@ -6,18 +6,16 @@ import {
 	View,
 	TouchableOpacity,
 	Text,
-	Alert, StatusBar, Modal, Dimensions
+	StatusBar
 } from "react-native";
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../AuthContext/AuthContext";
+import React, { useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PRODUCTION_SERVER } from "../services/configs";
 import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
-
-const windowWidth = Dimensions.get('screen').width;
+import Loading from "../Components/loading/Loading";
 
 const Login = ({ navigation }) => {
 	const image = {
@@ -94,56 +92,41 @@ const Login = ({ navigation }) => {
 
 	const evaluateToken = (currentToken) => {
 		var decodedToken = jwtDecode(currentToken);
-
 		if (decodedToken.result.type === null || decodedToken.result.type === '') {
 			return navigation.navigate("SignUpUserType");
 		}
-
 		navigation.navigate("Dashboard");
 	}
 
 	return (
-		<SafeAreaView style={{ backgroundColor: "#E1F5E4" }}>
-			<Modal
-				animationType="fade"
-				transparent={true}
-				visible={showLoadingModal}
-				onRequestClose={() => {
-					setShowLoadingModal(!showLoadingModal);
-				}}>
-				<View style={styles.centeredView}>
-					<View style={styles.modalView}>
-						<Image
-							source={require("../assets/loading_icon.gif")}
-							resizeMode="contain"
-							style={{ width: 100, height: 100 }}
-						/>
-						<Text style={styles.modalText}>{loadingMessage}</Text>
-					</View>
-				</View>
-			</Modal>
-
+		<SafeAreaView style={styles.root}>
+			<Loading 
+			  open={showLoadingModal} 
+			  onClose={() => setShowLoadingModal(!showLoadingModal)}
+			  message={loadingMessage}
+			/>
 			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
 			<KeyboardAvoidingView style={styles.container} behavior="height">
 				<View style={styles.imageContainer}>
 					<Image style={styles.image} source={image} />
 				</View>
-
-				<Text style={styles.loginText}>Log in</Text>
-
 				<View style={styles.inputContainer}>
+					<Text style={styles.loginText}>Log in</Text>
 					<Text style={styles.label}>Email</Text>
-					<TextInput
+					<View style={styles.inputView}>
+					  <TextInput
 						placeholder="Email Address"
 						defaultValue={emailInput}
 						onChangeText={(text) => {
 							setEmailInput(text);
 						}}
 						style={styles.input}
-					/>
+					  />
+					</View>
 
 					<Text style={styles.label}>Password</Text>
-					<TextInput
+					<View style={styles.inputView}>
+					  <TextInput
 						placeholder="Password"
 						defaultValue={passwordInput}
 						onChangeText={(text) => {
@@ -151,7 +134,8 @@ const Login = ({ navigation }) => {
 						}}
 						style={styles.input}
 						secureTextEntry
-					/>
+					  />
+					</View>
 
 					{error ? (
 						<Text style={styles.errorMessage}>*{errorMessage}</Text>
@@ -162,77 +146,79 @@ const Login = ({ navigation }) => {
 					<Text style={styles.forgotPassword} onPress={() => {
 						navigation.navigate('ForgotPassword')
 					}}>Forgot Password?</Text>
-				</View>
 
-				<View style={styles.buttonContainer}>
-					{/* onPress={() =>navigation.navigate("Dashboard")} */}
-					<TouchableOpacity onPress={() => loginNow()} style={styles.button}>
+                    <TouchableOpacity onPress={() => loginNow()} style={styles.button}>
 						<Text style={styles.buttonText}>Log in</Text>
 					</TouchableOpacity>
 				</View>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
-
-
 	);
 };
 
 export default Login;
 
 const styles = StyleSheet.create({
+	root: { 
+		backgroundColor: "#E1F5E4", 
+		height: '100%',
+		width: '100%', 
+		display: 'flex', 
+		alignItems: 'center', 
+		justifyContent: 'center',
+	},
 	image: {
 		justifyContent: "center",
 		width: 200,
 		height: 200,
-		resizeMode: "center",
-		marginTop: 30
+		resizeMode: "center"
 	},
-
-	imageContainer: {
-		width: windowWidth,
-		height: 200,
-		alignItems: "center",
-		justifyContent: "center"
-	},
-
 	container: {
-		height: '100%',
-		justifyContent: "center",
+		display: 'flex',
+		flexDirection: 'column',
+		gap: 10,
+		width: '100%',
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: 'auto'
+	},
+	imageContainer: {
+	    display: 'flex',
+		flexDirection: 'column',
+		height: 200,
+		width: '100%',
 		alignItems: "center",
-
+		justifyContent: "center",
 	},
 	inputContainer: {
-		marginTop: 10
+		marginTop: 10,
+		paddingHorizontal: 35,
+		width: '100%'
 	},
 	label: {
 		color: "#4d7861",
-		marginLeft: 41,
 	},
-
+	inputView: { 
+		backgroundColor: 'white',
+		marginVertical: 5, 
+		overflow:'hidden', 
+		borderRadius: 1, 
+		borderWidth: .1,
+		width: '100%'
+	},
 	input: {
-		margin: 5,
 		height: 50,
-		width: 340,
 		borderColor: "#7a42f4",
 		paddingHorizontal: 15,
 		borderWidth: 0.1,
-		borderRadius: 2,
-		marginLeft: 41,
-		marginRight: 41,
-		paddingVertical: 1,
 		fontSize: 16,
 		color: "#4d7861",
-		backgroundColor: "#ffffff",
 		overflow: 'hidden'
 	},
 	button: {
 		backgroundColor: "#28CD41",
 		padding: 10,
-		width: 380,
 		borderRadius: 10,
-		width: 340,
-		marginLeft: 41,
-		marginRight: 41,
 		marginTop: 5,
 		paddingVertical: 18,
 	},
@@ -249,22 +235,20 @@ const styles = StyleSheet.create({
 		color: "#364D39",
 		fontSize: 30,
 		lineHeight: 30,
-		width: windowWidth,
 		textTransform: "uppercase",
-		marginLeft: 41,
+		marginBottom: 20
 	},
 	errorMessage: {
 		textAlign: "left",
-		marginLeft: 41,
 		color: "red",
 		paddingVertical: 7.5,
 	},
 	forgotPassword: {
 		textAlign: "right",
-		marginRight: 41,
 		textDecorationLine: "underline",
 		color: "#4d7861",
-		marginBottom: 10
+		marginBottom: 10,
+		marginRight: 10
 	},
 	orText: {
 		color: "#4d7861",
@@ -282,37 +266,12 @@ const styles = StyleSheet.create({
 	googleImage: {
 		width: 50,
 		height: 50,
-		marginRight: 7,
 	},
 
 	facebookImage: {
 		width: 36,
 		height: 36,
 		marginTop: 4,
-		marginLeft: 7,
-	},
-
-	centeredView: {
-		backgroundColor: 'rgba(250, 250, 250, .7)',
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	modalView: {
-		width: '80%',
-		margin: 20,
-		backgroundColor: 'white',
-		borderRadius: 20,
-		padding: 35,
-		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
-		elevation: 5,
 	},
 	buttonOpen: {
 		backgroundColor: '#F194FF',
@@ -324,9 +283,5 @@ const styles = StyleSheet.create({
 		color: 'white',
 		fontWeight: 'bold',
 		textAlign: 'center',
-	},
-	modalText: {
-		marginBottom: 15,
-		textAlign: 'center',
-	},
+	}
 });

@@ -52,7 +52,7 @@ const Notifications = ({ notifVisible, toggleNotifNavigationView, props: { userI
 										key={notification.id}
 									>
 										<Image
-											source={require("../assets/dailyAssess_icon.png")}
+											source={require("../../assets/dailyAssess_icon.png")}
 											resizeMode="contain"
 											style={{
 												width: 32,

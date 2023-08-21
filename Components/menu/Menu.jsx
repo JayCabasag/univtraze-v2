@@ -206,7 +206,7 @@ return (
 										}}
 									>
 										<Image
-											source={require('../assets/menuhome_icon.png')}
+											source={require('../../assets/menuhome_icon.png')}
 											resizeMode="contain"
 											style={{
 												width: 15,
@@ -233,7 +233,7 @@ return (
 										}}
 									>
 										<Image
-											source={require('../assets/updateinfo_icon.png')}
+											source={require('../../assets/updateinfo_icon.png')}
 											resizeMode="contain"
 											style={{
 												width: 15,
@@ -259,7 +259,7 @@ return (
 										}}
 									>
 										<Image
-											source={require("../assets/temp_history.png")}
+											source={require("../../assets/temp_history.png")}
 											resizeMode="contain"
 											style={{
 												width: 17,
@@ -285,7 +285,7 @@ return (
 										}}
 									>
 										<Image
-											source={require('../assets/accountsetting_icon.png')}
+											source={require('../../assets/accountsetting_icon.png')}
 											resizeMode="contain"
 											style={{
 												width: 15,
@@ -311,7 +311,7 @@ return (
 										}}
 									>
 										<Image
-											source={require("../assets/room_enter.png")}
+											source={require("../../assets/room_enter.png")}
 											resizeMode="contain"
 											style={{
 												width: 17,
@@ -338,7 +338,7 @@ return (
 										>
 										
 											<Image
-												source={require('../assets/logout_icon.png')}
+												source={require('../../assets/logout_icon.png')}
 												resizeMode="contain"
 												style={{
 													width: 15,

@@ -8,9 +8,8 @@ import {
 	StatusBar,
 } from "react-native";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-const HomeScreen = ({ navigation }) => {
+const Home = ({ navigation }) => {
 	const image = {
 		uri: "https://firebasestorage.googleapis.com/v0/b/tcuhub-cf9e1.appspot.com/o/images%2Fbackground%20image.png?alt=media&token=707b9706-c43e-48ed-a859-07e786939a81",
 	};
@@ -38,7 +37,7 @@ const HomeScreen = ({ navigation }) => {
 
 					<View style={{ paddingTop: 10, marginLeft: 30 }}>
 						<Text style={{ color: "#ffff", fontSize: 16 }}>
-							University content tracing app {"\n"} makes tracing easier
+							University contactt tracing app {"\n"}makes tracing easier
 						</Text>
 					</View>
 
@@ -70,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
 	);
 };
 
-export default HomeScreen;
+export default Home;
 
 const styles = StyleSheet.create({
 	container: {

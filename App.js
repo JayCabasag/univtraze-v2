@@ -1,30 +1,30 @@
 import * as React from 'react';
 import { ToastProvider } from 'react-native-toast-notifications'
-import HomeScreen from './Components/HomeScreen';
-import Login from './Components/Login';
+import Home from './screens/Home';
+import Login from './screens/Login';
+import SignUp from './screens/SignUp';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SignUp from './Components/SignUp';
 import { AuthProvider } from './AuthContext/AuthContext';
-import Dashboard from './Components/Dashboard';
-import SignUpUserType from './Components/SignUpUserType';
-import SignUpUserCredentialsStudent from './Components/SignUpUserCredentialsStudent';
-import QrScanner from './Components/QrScanner';
-import ReportCovidCase from './Components/ReportCovidCase'
-import ReportEmergency from './Components/ReportEmergency'
-import SignUpUserCredentialsEmployee from './Components/SignUpUserCredentialsEmployee';
-import SignUpUserCredentialsVisitor from './Components/SignUpUserCredentialsVisitor';
-import DailyAsessment from './Components/DailyAsessment';
-import RoomVisited from './Components/RoomVisited';
-import TemperatureHistory from './Components/TemperatureHistory';
-import SignUpCredentialsDocuments from './Components/SignUpCredentialsDocuments';
-import SignUpVaccination from './Components/SignUpVaccination';
-import ForgotPassword from './Components/ForgotPassword'
-import ResetPassword from './Components/ResetPassword';
-import TermsAndConditions from './Components/TermsAndConditions';
-import AccountSettings from './Components/AccountSettings';
-import UpdatePassword from './Components/UpdatePassword';
-import UpdatePersonalInfo from './Components/UpdatePersonalInfo';
+import Dashboard from './screens/Dashboard';
+import SignUpUserType from './screens/SignUpUserType';
+import SignUpUserCredentialsStudent from './screens/SignUpUserCredentialsStudent';
+import QrScanner from './screens/QrScanner';
+import ReportCovidCase from './screens/ReportCovidCase'
+import ReportEmergency from './screens/ReportEmergency'
+import SignUpUserCredentialsEmployee from './screens/SignUpUserCredentialsEmployee';
+import SignUpUserCredentialsVisitor from './screens/SignUpUserCredentialsVisitor';
+import DailyAsessment from './screens/DailyAsessment';
+import RoomVisited from './screens/RoomVisited';
+import TemperatureHistory from './screens/TemperatureHistory';
+import SignUpCredentialsDocuments from './screens/SignUpCredentialsDocuments';
+import SignUpVaccination from './screens/SignUpVaccination';
+import ForgotPassword from './screens/ForgotPassword'
+import ResetPassword from './screens/ResetPassword';
+import TermsAndConditions from './screens/TermsAndConditions';
+import AccountSettings from './screens/AccountSettings';
+import UpdatePassword from './screens/UpdatePassword';
+import UpdatePersonalInfo from './screens/UpdatePersonalInfo';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
 import { default as theme } from './utils/theme/theme.json';
@@ -54,7 +54,7 @@ export default function App() {
               <Stack.Screen options={{ headerShown: false }} name="Dashboard" component={Dashboard} />
               <Stack.Screen options={{ headerShown: false }} name="TemperatureHistory" component={TemperatureHistory} />
               <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
-              <Stack.Screen options={{ headerShown: false }} name="Home" component={HomeScreen} />
+              <Stack.Screen options={{ headerShown: false }} name="Home" component={Home} />
               <Stack.Screen options={{ headerShown: false }} name="ForgotPassword" component={ForgotPassword} />
               <Stack.Screen options={{ headerShown: false }} name="ResetPassword" component={ResetPassword} />
               <Stack.Screen options={{ headerShown: false }} name="TermsAndCondition" component={TermsAndConditions} />

@@ -10,3 +10,9 @@ export const MedicalConditions = [
     'Breathing difficulties',
     'Others',
 ]
+
+export const UserTypes = {
+    STUDENT: 'student',
+    EMPLOYEE: 'employee',
+    VISITOR: 'visitor'
+}
