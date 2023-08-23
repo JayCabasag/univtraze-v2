@@ -9,91 +9,125 @@ import {
 	StatusBar
 } from "react-native";
 import React, { useState } from "react";
-import * as SecureStore from "expo-secure-store";
-import axios from "axios";
-import jwtDecode from "jwt-decode";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PRODUCTION_SERVER } from "../services/configs";
-import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
+import { DEFAULT_ERROR_MESSAGE, UserTypes } from "../utils/app_constants";
 import Loading from "../Components/loading/Loading";
+import TypeSelect from "../Components/type/TypeSelect";
+import { isEmail } from "../utils/regex";
+import { genericPostRequest } from "../services/genericPostRequest";
+import { useUserDispatch } from "../contexts/user/UserContext";
 
 const Login = ({ navigation }) => {
-	const image = {
-		uri: "https://firebasestorage.googleapis.com/v0/b/tcuhub-cf9e1.appspot.com/o/images%2Flogin_image.png?alt=media&token=ebb53e48-2bc0-485d-8456-fe8a31683061",
-	};
-
 	const [error, setError] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const [emailInput, setEmailInput] = useState("");
 	const [passwordInput, setPasswordInput] = useState("");
+	const [selectedType, setSelectedType] = useState(UserTypes.STUDENT)
+	const userDispatch = useUserDispatch()
 
 	//Variables for loading
 
 	const [showLoadingModal, setShowLoadingModal] = useState(false)
 	const [loadingMessage, setLoadingMessage] = useState("Please wait...")
 
-
-	async function save(key, value) {
-		await SecureStore.setItemAsync(key, value);
-	}
-
 	const loginNow = async () => {
-
-		setShowLoadingModal(true)
-		setLoadingMessage('Validating your credentials...please wait')
+		setShowLoadingModal(true);
+		setLoadingMessage('Validating your credentials...');
+	  
 		if (emailInput === "") {
-			setError(true);
-			setErrorMessage("Please input your email address");
-		} else {
-			let re =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-			if (re.test(emailInput)) {
-				if (passwordInput === "") {
-					setError(true);
-					setErrorMessage("Please input password");
-				} else if (passwordInput.length < 7) {
-					setError(true);
-					setErrorMessage("Password field Minimum of 8 characters");
-				} else {
-					const data = {
-						email: emailInput,
-						password: passwordInput,
-					};
-					await axios
-						.post(`${PRODUCTION_SERVER}/user/login`, data)
-						.then((response) => {
-							const success = response.data.success;
-							if (success === 0) {
-								setError(true);
-								setErrorMessage(response.data.data);
-							} else {
-								setLoadingMessage('Loggin in...')
-								setError(false);
-								save("x-token", response.data.token);
-								setEmailInput("");
-								setPasswordInput("");
-								evaluateToken(response.data.token);
-							}
-						}).catch(() => {
-							alert(DEFAULT_ERROR_MESSAGE)
-						}).finally(() => {
-							setShowLoadingModal(false)
-						})
-				}
-			} else {
-				setError(true);
-				setErrorMessage("Invalid email address");
-			}
+		  setError(true);
+		  setErrorMessage("Please input your email address");
+		  setShowLoadingModal(false);
+		  setLoadingMessage('Please wait');
+		  return;
 		}
-		setShowLoadingModal(false)
-		setLoadingMessage('Please wait')
+	  
+		if (!isEmail.test(emailInput)) {
+		  setError(true);
+		  setErrorMessage("Invalid email address");
+		  setShowLoadingModal(false);
+		  setLoadingMessage('Please wait');
+		  return;
+		}
+	  
+		if (passwordInput === "") {
+		  setError(true);
+		  setErrorMessage("Please input password");
+		  setShowLoadingModal(false);
+		  setLoadingMessage('Please wait');
+		  return;
+		}
+	  
+		if (passwordInput.length < 8) {
+		  setError(true);
+		  setErrorMessage("Password field requires a minimum of 8 characters");
+		  setShowLoadingModal(false);
+		  setLoadingMessage('Please wait');
+		  return;
+		}
+	  
+		const data = {
+		  email: emailInput,
+		  password: passwordInput,
+		  type: selectedType
+		};
+		
+		await genericPostRequest('/auth/signin', data)
+		.then((response) => {
+			const data = response
+			const user = data['user']
+			userDispatch({ 
+				type: 'update', 
+			    payload: { 
+					id: user.sub, 
+					type: user.type, 
+					email: user.email, 
+					token: data['access_token'],
+					verified: user.verified,
+					status: 'authenticated'
+				}
+			})
+			setLoadingMessage('Logging in...');
+			redirect(user.verified)
+		})
+		.catch((error) => {
+			setShowLoadingModal(false);
+			if (error.response.status === 401) {
+				alert('Invalid creadentials')
+				userDispatch({ 
+					type: 'reset', 
+					payload: { 
+						id: null, 
+						type: null, 
+						email: null, 
+						token: null,
+						verified: false,
+						status: 'idle'
+					}
+				})
+				return 
+			}
+			alert(DEFAULT_ERROR_MESSAGE);
+		})
+		.finally(() => {
+			setShowLoadingModal(false);
+			setError(false)
+		    setLoadingMessage('');
+		})
 	};
 
-	const evaluateToken = (currentToken) => {
-		var decodedToken = jwtDecode(currentToken);
-		if (decodedToken.result.type === null || decodedToken.result.type === '') {
-			return navigation.navigate("SignUpUserType");
+	const redirect = (verified) => {
+		if (!verified) {
+			const typeToRoute = {
+			  [UserTypes.STUDENT]: "SignUpUserCredentialsStudent",
+			  [UserTypes.EMPLOYEE]: "SignUpUserCredentialsEmployee",
+			  [UserTypes.VISITOR]: "SignUpUserCredentialsVisitor",
+			};
+			  
+			const route = typeToRoute[selectedType];
+			if (route) {
+			  return navigation.navigate(route, { type: selectedType });
+			}
 		}
 		navigation.navigate("Dashboard");
 	}
@@ -108,12 +142,12 @@ const Login = ({ navigation }) => {
 			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
 			<KeyboardAvoidingView style={styles.container} behavior="height">
 				<View style={styles.imageContainer}>
-					<Image style={styles.image} source={image} />
+					<Image style={styles.image} source={require('../assets/login_image.png')} />
 				</View>
 				<View style={styles.inputContainer}>
 					<Text style={styles.loginText}>Log in</Text>
+					<TypeSelect type={selectedType} setSelectedType={setSelectedType}/>
 					<Text style={styles.label}>Email</Text>
-					<View style={styles.inputView}>
 					  <TextInput
 						placeholder="Email Address"
 						defaultValue={emailInput}
@@ -122,10 +156,8 @@ const Login = ({ navigation }) => {
 						}}
 						style={styles.input}
 					  />
-					</View>
 
 					<Text style={styles.label}>Password</Text>
-					<View style={styles.inputView}>
 					  <TextInput
 						placeholder="Password"
 						defaultValue={passwordInput}
@@ -135,13 +167,8 @@ const Login = ({ navigation }) => {
 						style={styles.input}
 						secureTextEntry
 					  />
-					</View>
 
-					{error ? (
-						<Text style={styles.errorMessage}>*{errorMessage}</Text>
-					) : (
-						<Text style={styles.errorMessage}></Text>
-					)}
+					{error && <Text style={styles.errorMessage}>*{errorMessage}</Text> }
 
 					<Text style={styles.forgotPassword} onPress={() => {
 						navigation.navigate('ForgotPassword')
@@ -192,28 +219,29 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		marginTop: 10,
-		paddingHorizontal: 35,
+		paddingHorizontal: 25,
 		width: '100%'
 	},
 	label: {
 		color: "#4d7861",
 	},
-	inputView: { 
-		backgroundColor: 'white',
-		marginVertical: 5, 
-		overflow:'hidden', 
-		borderRadius: 1, 
-		borderWidth: .1,
-		width: '100%'
-	},
+
 	input: {
+		marginTop: 5,
+		marginBottom: 5,
+		marginLeft: 0,
+		marginRight: 0,
+		width: "100%",
 		height: 50,
-		borderColor: "#7a42f4",
+		borderColor: "#28CD41",
 		paddingHorizontal: 15,
-		borderWidth: 0.1,
+		borderWidth: 1,
+		borderRadius: 10,
+		overflow: "hidden",
+		paddingVertical: 1,
 		fontSize: 16,
 		color: "#4d7861",
-		overflow: 'hidden'
+		backgroundColor: "#ffff",
 	},
 	button: {
 		backgroundColor: "#28CD41",
@@ -247,7 +275,7 @@ const styles = StyleSheet.create({
 		textAlign: "right",
 		textDecorationLine: "underline",
 		color: "#4d7861",
-		marginBottom: 10,
+		marginVertical: 10,
 		marginRight: 10
 	},
 	orText: {

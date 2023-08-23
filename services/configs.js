@@ -1,1 +1,1 @@
-export const PRODUCTION_SERVER = 'https://univtraze-web-api-v1.onrender.com/api'
+export const SERVER = 'https://zany-pink-rhinoceros-tie.cyclic.cloud/api/v1'

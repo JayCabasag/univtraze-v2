@@ -13,28 +13,16 @@ import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
 import jwtDecode from "jwt-decode";
-import { Dimensions } from 'react-native';
 import { PRODUCTION_SERVER } from "../services/configs";
 import Loading from "../Components/loading/Loading";
 import Succes from "../Components/success/Succes";
-import { UserTypes } from "../utils/app_constants";
+import TypeSelect from "../Components/type/TypeSelect";
 
-const TypeOption = ({ label, isActive, onPress }) => (
-	<TouchableOpacity
-	  style={isActive ? styles.typeOptionActive : styles.typeOption}
-	  onPress={onPress}
-	>
-	  <Text style={isActive ? styles.typeTextActive : styles.typeText}>{label}</Text>
-	</TouchableOpacity>
-  );
-
-const SignUp = ({ navigation }) => {
-
+const SignUp = ({ navigation, route }) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
-	const [provider, setProvider] = useState("email/password");
-	const [selectedType, setSelectedType] = useState(UserTypes.STUDENT)
+	const [selectedType, setSelectedType] = useState(route.params.type)
 
 	const [error, setError] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
@@ -49,81 +37,73 @@ const SignUp = ({ navigation }) => {
 		await SecureStore.setItemAsync(key, value);
 	}
 
-	const validateUserInput = async () => {
+	const signUpNow = async () => {
 		if (!agreeWithTermsAndCondition) {
-			setError(true);
-			setErrorMessage("Please agree with our app terms and conditions");
-			return
+		  setError(true);
+		  setErrorMessage("Please agree with our app terms and conditions");
+		  return;
 		}
+	  
 		if (email === "") {
-			setError(true);
-			setErrorMessage("Please input your email address");
-		} else {
-			let re =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-			if (re.test(email)) {
-				if (password === "") {
-					setError(true);
-					setErrorMessage("Please input password");
-				} else if (password.length < 7) {
-					setError(true);
-					setErrorMessage("Password field Minimum of 8 characters");
-				} else if (password !== confirmPassword) {
-					setError(true);
-					setErrorMessage("Confirm password did not match!");
-				} else {
-					//Data checking with api
-
-					setShowLoadingModal(true)
-
-					const data = {
-						provider: provider,
-						email: email,
-						password: password,
-					};
-
-					setLoadingMessage('Please wait while creating your acccount...')
-
-					await axios
-						.post(`${PRODUCTION_SERVER}/user/signup`, data)
-						.then((response) => {
-							const success = response.data.success;
-							if (success === 0) {
-								setLoadingMessage('Please wait...')
-								setShowLoadingModal(false)
-								setError(true);
-								setErrorMessage(response.data.message);
-							} else {
-								setLoadingMessage('Please wait...')
-								setShowLoadingModal(false)
-								setError(false);
-							}
-						})
-						.catch((error) => {
-							setError(true);
-							setErrorMessage("Failed creating account, please check your connection...");
-						});
-
-					setLoadingMessage('Please wait...')
-					setShowLoadingModal(false)
-
-				}
-			} else {
-				setError(true);
-				setErrorMessage("Invalid email address");
-			}
+		  setError(true);
+		  setErrorMessage("Please input your email address");
+		  return;
 		}
-	};
-
-	useEffect(() => {
-		//Time out to fire the cannon
-		setTimeout(() => {
-			setShoot(true);
-		}, 1000);
-	}, []);
-
-
+	  
+		const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	  
+		if (!emailRegex.test(email)) {
+		  setError(true);
+		  setErrorMessage("Invalid email address");
+		  return;
+		}
+	  
+		if (password === "") {
+		  setError(true);
+		  setErrorMessage("Please input password");
+		  return;
+		}
+	  
+		if (password.length < 8) {
+		  setError(true);
+		  setErrorMessage("Password field requires a minimum of 8 characters");
+		  return;
+		}
+	  
+		if (password !== confirmPassword) {
+		  setError(true);
+		  setErrorMessage("Confirm password did not match!");
+		  return;
+		}
+	  
+		setShowLoadingModal(true);
+		setLoadingMessage('Please wait while creating your account...');
+	  
+		const data = {
+		  email: email,
+		  password: password,
+		  type: selectedType
+		};
+	  
+		try {
+		  const response = await axios.post(`${PRODUCTION_SERVER}/user/signup`, data);
+	  
+		  const success = response.data.success;
+		  if (success === 0) {
+			setError(true);
+			setErrorMessage(response.data.message);
+		  } else {
+			setError(false);
+		  }
+		} catch (error) {
+		  setError(true);
+		  setErrorMessage("Failed creating account, please check your connection...");
+		} finally {
+		  setLoadingMessage('Please wait...');
+		  setShowLoadingModal(false);
+		}
+	  }
+	
 	const handleLoginUser = async (email, password) => {
 		setShowLoadingModal(true)
 		setLoadingMessage('Logging in, please wait!...')
@@ -164,9 +144,6 @@ const SignUp = ({ navigation }) => {
 		navigation.navigate("Dashboard");
 	}
 
-	const viewTermsAndConditions = async () => {
-		navigation.navigate('TermsAndCondition')
-	}
 	return (
 		<SafeAreaView style={styles.root}>
 			<Loading
@@ -179,36 +156,15 @@ const SignUp = ({ navigation }) => {
 			<KeyboardAvoidingView style={styles.container} behavior='height'>
 				<View style={styles.inputContainer}>
 					<Text style={styles.header}>Sign Up</Text>
-
-					<View style={styles.type}>
-					<TypeOption
-					  label="Student"
-					  isActive={selectedType === UserTypes.STUDENT}
-					  onPress={() => setSelectedType(UserTypes.STUDENT)}
-					/>
-					<TypeOption
-					  label="Employee"
-					  isActive={selectedType === UserTypes.EMPLOYEE}
-					  onPress={() => setSelectedType(UserTypes.EMPLOYEE)}
-					/>
-					<TypeOption
-					  label="Visitor"
-					  isActive={selectedType === UserTypes.VISITOR}
-					  onPress={() => setSelectedType(UserTypes.VISITOR)}
-					/>
-					</View>
-
+					<TypeSelect type={selectedType} setSelectedType={setSelectedType} />
 					<Text style={styles.label}>Email</Text>
-					<View style={styles.inputView}>
 						<TextInput
 							placeholder="Email Address"
 							defaultValue={email}
 							onChangeText={(text) => setEmail(text)}
 							style={styles.input}
 						/>
-					</View>
 					<Text style={styles.label}>Password</Text>
-					<View style={styles.inputView}>
 						<TextInput
 							placeholder="Password"
 							defaultValue={password}
@@ -216,10 +172,8 @@ const SignUp = ({ navigation }) => {
 							style={styles.input}
 							secureTextEntry
 						/>
-					</View>
 
 					<Text style={styles.label}>Confirm Password</Text>
-					<View style={styles.inputView}>
 						<TextInput
 							placeholder="Confirm Password"
 							defaultValue={confirmPassword}
@@ -227,24 +181,19 @@ const SignUp = ({ navigation }) => {
 							style={styles.input}
 							secureTextEntry
 						/>
-					</View>
 
-					{error ? (
-						<Text style={styles.errorMessage}>*{errorMessage}</Text>
-					) : (
-						<Text style={styles.errorMessage}></Text>
-					)}
-					<View style={{ display: 'flex', flexDirection: 'row' }}>
+					{error && <Text style={styles.errorMessage}>*{errorMessage}</Text>}
+					<View style={{ display: 'flex', flexDirection: 'row', marginVertical: 15 }}>
 						<Checkbox
 							value={agreeWithTermsAndCondition}
-							onValueChange={() => { setAgreeWithTermsAndCondition(!agreeWithTermsAndCondition) }}
-							style={{ marginRight: 5 }}
+							onValueChange={() => setAgreeWithTermsAndCondition(!agreeWithTermsAndCondition)}
+							style={{ marginHorizontal: 10 }}
 						/>
-						<Text style={{ color: '#4d7861' }} onPress={() => { viewTermsAndConditions() }}>Agree with our Terms and conditions</Text>
+						<Text style={{ color: '#4d7861' }} onPress={() => navigation.navigate('TermsAndCondition')}>Agree with our Terms and conditions</Text>
 					</View>
 
 					<TouchableOpacity
-						onPress={() => validateUserInput()}
+						onPress={signUpNow}
 						style={styles.button}
 					>
 						<Text style={styles.buttonText}>Sign Up</Text>
@@ -347,26 +296,26 @@ const styles = StyleSheet.create({
 	label: {
 		color: "#4d7861"
 	},
-	inputView: { 
-		backgroundColor: 'white',
-		marginVertical: 5, 
-		overflow:'hidden', 
-		borderRadius: 1, 
-		borderWidth: .1,
-		width: '100%'
-	},
 	input: {
+		marginTop: 5,
+		marginBottom: 5,
+		marginLeft: 0,
+		marginRight: 0,
+		width: "100%",
 		height: 50,
-		borderColor: "#7a42f4",
+		borderColor: "#28CD41",
 		paddingHorizontal: 15,
-		borderWidth: 0.1,
+		borderWidth: 1,
+		borderRadius: 10,
+		overflow: "hidden",
+		paddingVertical: 1,
 		fontSize: 16,
 		color: "#4d7861",
-		overflow: 'hidden'
+		backgroundColor: "#ffff",
 	},
 	inputContainer: {
 		width: '100%',
-		paddingHorizontal: 35
+		paddingHorizontal: 25
 	},
 	button: {
 		backgroundColor: "#28CD41",
@@ -427,7 +376,6 @@ const styles = StyleSheet.create({
 	},
 	errorMessage: {
 		textAlign: "left",
-		marginLeft: 41,
 		color: "red",
 		paddingVertical: 7.5,
 	},

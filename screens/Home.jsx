@@ -8,8 +8,10 @@ import {
 	StatusBar,
 } from "react-native";
 import React from "react";
+import { useUserDispatch } from "../contexts/user/UserContext";
 
 const Home = ({ navigation }) => {
+	const userDispatch = useUserDispatch()
 	const image = {
 		uri: "https://firebasestorage.googleapis.com/v0/b/tcuhub-cf9e1.appspot.com/o/images%2Fbackground%20image.png?alt=media&token=707b9706-c43e-48ed-a859-07e786939a81",
 	};
@@ -17,9 +19,12 @@ const Home = ({ navigation }) => {
 		uri: "https://firebasestorage.googleapis.com/v0/b/tcuhub-cf9e1.appspot.com/o/images%2Flogo-light.png?alt=media&token=9417a00a-2c1d-4091-8923-59dab5e286b1",
 	};
 
-	return (
+	const handleCreateAccount = () => {
+		userDispatch({ type: 'reset' })
+		navigation.navigate("SignUpUserType");
+	}
 
-	
+	return (
 			<View style={styles.container}>
 					<StatusBar animated={true} backgroundColor="#28CD41" />
 				<ImageBackground
@@ -57,7 +62,7 @@ const Home = ({ navigation }) => {
 						</TouchableOpacity>
 
 						<TouchableOpacity
-							onPress={() => navigation.navigate("SignUp")}
+							onPress={handleCreateAccount}
 							style={styles.createAnAccountButton}
 						>
 							<Text style={styles.createAnAccountText}>Create an account</Text>

@@ -28,12 +28,14 @@ import UpdatePersonalInfo from './screens/UpdatePersonalInfo';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
 import { default as theme } from './utils/theme/theme.json';
+import { UserProvider } from './contexts/user/UserContext';
 
 export default function App() {
 
   const Stack = createNativeStackNavigator();
 
   return (
+    <UserProvider>
     <ApplicationProvider {...eva} theme={{ ...eva.light, ...theme }} >
       <ToastProvider>
         <AuthProvider>
@@ -66,6 +68,7 @@ export default function App() {
         </AuthProvider>
       </ToastProvider>
     </ApplicationProvider>
+    </UserProvider>
   );
 }
 

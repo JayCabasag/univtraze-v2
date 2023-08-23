@@ -1,34 +1,27 @@
 import {
 	KeyboardAvoidingView,
-	Image,
 	StyleSheet,
-	TextInput,
 	View,
 	TouchableOpacity,
 	Text,
-	StatusBar,
-	Modal
+	StatusBar
 } from "react-native";
-import Checkbox from 'expo-checkbox';
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ConfettiCannon from 'react-native-confetti-cannon';
-import ModalSuccess from "react-native-modal";
 import { Dimensions } from 'react-native';
 import { ScrollView } from "react-native";
 
 
 const TermsAndConditions = ({ navigation }) => {
-	const windowWidth = Dimensions.get('window').width;
 	const windowHeight = Dimensions.get('window').height;
 
 	return (
 		<SafeAreaView style={{ height: '100%', backgroundColor: "#E1F5E4" }}>
 			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
 			<KeyboardAvoidingView style={styles.container} behavior='height'>
-				<ScrollView style={{ height: windowHeight }}>
-					<View style={{ width: '100%' }}>
-						<Text style={{ fontWeight: 'bold', textAlign: 'center' }}>Terms Conditions</Text>
+				<ScrollView style={{ height: windowHeight, width: '100%' }}>
+					<View style={{ width: '100%', paddingHorizontal: 25, display: 'flex' , gap: 15}}>
+						<Text style={{ fontWeight: 'bold', fontSize: 24, textAlign: 'center' }}>Terms Conditions</Text>
 						<Text>
 							UnivTraze Contact Tracing is an application that can perform the contact tracing of individuals and all the persons whom he got in contact within seconds. UnivTraze Contact Tracing application software is developed and owned Mr. Edmar G. Tan and development team.
 						</Text>
@@ -179,7 +172,7 @@ const TermsAndConditions = ({ navigation }) => {
 						<Text>UnivTraze Contact Tracing is owned, developed and managed by Mr. Edmar G. Tan and their development team.</Text>
 						<Text style={{ fontWeight: 'bold' }}>If you have any questions about the Privacy Statement or any other questions regarding our privacy practices, please contact us at: ramdenat1987@univtraze.net</Text>
 						<TouchableOpacity
-							onPress={() => { navigation.goBack() }}
+							onPress={() => navigation.goBack()}
 							style={styles.button}
 						>
 							<Text style={styles.buttonText}>Return to sign up</Text>
@@ -197,14 +190,8 @@ const windowWidth = Dimensions.get('screen').width;
 const windowHeight = Dimensions.get('screen').height;
 
 const styles = StyleSheet.create({
-
 	buttonContainer: {
-		backgroundColor: "transparent",
-	},
-	button: {
-		borderRadius: 20,
-		padding: 10,
-		elevation: 2,
+		backgroundColor: "red",
 	},
 	buttonOpen: {
 		backgroundColor: '#F194FF',
@@ -238,8 +225,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: windowHeight,
 		justifyContent: "center",
-		alignItems: "center",
-		paddingHorizontal: 20
+		alignItems: "center"
 	},
 	label: {
 		color: "#4d7861",
@@ -268,7 +254,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#28CD41",
 		padding: 10,
 		borderRadius: 10,
-		width: '80%',
+		width: '100%',
 		marginTop: 5,
 		paddingVertical: 18,
 		alignSelf: 'center',
