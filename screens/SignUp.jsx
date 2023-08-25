@@ -8,34 +8,29 @@ import {
 	StatusBar
 } from "react-native";
 import Checkbox from 'expo-checkbox';
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as SecureStore from "expo-secure-store";
-import jwtDecode from "jwt-decode";
-import { PRODUCTION_SERVER } from "../services/configs";
 import Loading from "../Components/loading/Loading";
 import Succes from "../Components/success/Succes";
 import TypeSelect from "../Components/type/TypeSelect";
+import { useUserDispatch } from "../contexts/user/UserContext";
+import { genericPostRequest } from "../services/genericPostRequest";
+import { DEFAULT_ERROR_MESSAGE, UserTypes } from "../utils/app_constants";
 
 const SignUp = ({ navigation, route }) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [selectedType, setSelectedType] = useState(route.params.type)
+	const userDispatch = useUserDispatch()
 
 	const [error, setError] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const [agreeWithTermsAndCondition, setAgreeWithTermsAndCondition] = useState(false)
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
-	const [shoot, setShoot] = useState(false);
 
 	const [showLoadingModal, setShowLoadingModal] = useState(false)
 	const [loadingMessage, setLoadingMessage] = useState('Please wait...')
-
-	async function save(key, value) {
-		await SecureStore.setItemAsync(key, value);
-	}
 
 	const signUpNow = async () => {
 		if (!agreeWithTermsAndCondition) {
@@ -84,63 +79,61 @@ const SignUp = ({ navigation, route }) => {
 		  password: password,
 		  type: selectedType
 		};
-	  
-		try {
-		  const response = await axios.post(`${PRODUCTION_SERVER}/user/signup`, data);
-	  
-		  const success = response.data.success;
-		  if (success === 0) {
-			setError(true);
-			setErrorMessage(response.data.message);
-		  } else {
-			setError(false);
-		  }
-		} catch (error) {
-		  setError(true);
-		  setErrorMessage("Failed creating account, please check your connection...");
-		} finally {
-		  setLoadingMessage('Please wait...');
-		  setShowLoadingModal(false);
-		}
-	  }
-	
-	const handleLoginUser = async (email, password) => {
-		setShowLoadingModal(true)
-		setLoadingMessage('Logging in, please wait!...')
 
-		const data = {
-			email: email,
-			password: password,
-		};
-		await axios
-			.post(`${PRODUCTION_SERVER}/user/login`, data)
-			.then((response) => {
-				const success = response.data.success;
-
-				if (success === 0) {
-					setError(true);
-					setErrorMessage(response.data.data);
-					setLoadingMessage('Login failed')
-					setShowLoadingModal(false)
-
-				} else {
-					setError(false);
-					save("x-token", response.data.token);
-					setLoadingMessage('Login successful')
-					setShowLoadingModal(false)
-					evaluateToken(response.data.token);
+		await genericPostRequest('/auth/signup', data)
+		.then((response) => {
+			const data = response
+			const user = data['user']
+			userDispatch({ 
+				type: 'update', 
+			    payload: { 
+					id: user.sub, 
+					type: user.type, 
+					email: user.email, 
+					token: data['access_token'],
+					verified: user.verified,
+					status: 'authenticated'
 				}
-			});
-
+			})
+			setLoadingMessage('Logging in...');
+			redirect(user.verified)
+		})
+		.catch((error) => {
+			setShowLoadingModal(false);
+			if (error.response.status === 409) {
+				alert('User already exists')
+				userDispatch({ type: 'reset' })
+				return 
+			}
+			if (error.response.status === 401) {
+				alert('Invalid creadentials')
+				userDispatch({ type: 'reset' })
+				return 
+			}
+			console.log(error)
+			alert(DEFAULT_ERROR_MESSAGE);
+		})
+		.finally(() => {
+			setShowLoadingModal(false);
+			setError(false)
+		    setLoadingMessage('');
+		})
+	  
 	}
 
-	const evaluateToken = async (currentToken) => {
-		var decodedToken = jwtDecode(currentToken);
-
-		if (decodedToken.result.type === null || decodedToken.result.type === '') {
-			return navigation.navigate("SignUpUserType");
+	const redirect = (verified) => {
+		if (!verified) {
+			const typeToRoute = {
+			  [UserTypes.STUDENT]: "SignUpUserCredentialsStudent",
+			  [UserTypes.EMPLOYEE]: "SignUpUserCredentialsEmployee",
+			  [UserTypes.VISITOR]: "SignUpUserCredentialsVisitor",
+			};
+			  
+			const route = typeToRoute[selectedType];
+			if (route) {
+			  return navigation.navigate(route, { type: selectedType });
+			}
 		}
-
 		navigation.navigate("Dashboard");
 	}
 

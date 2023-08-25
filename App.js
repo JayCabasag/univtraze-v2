@@ -5,7 +5,6 @@ import Login from './screens/Login';
 import SignUp from './screens/SignUp';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AuthProvider } from './AuthContext/AuthContext';
 import Dashboard from './screens/Dashboard';
 import SignUpUserType from './screens/SignUpUserType';
 import SignUpUserCredentialsStudent from './screens/SignUpUserCredentialsStudent';
@@ -38,7 +37,6 @@ export default function App() {
     <UserProvider>
     <ApplicationProvider {...eva} theme={{ ...eva.light, ...theme }} >
       <ToastProvider>
-        <AuthProvider>
           <NavigationContainer>
             <Stack.Navigator initialRouteName='Home'>
               <Stack.Screen options={{ headerShown: false }} name="SignUpCredentialsDocuments" component={SignUpCredentialsDocuments} />
@@ -65,7 +63,6 @@ export default function App() {
               <Stack.Screen options={{ headerShown: false }} name="UpdatePersonalInfo" component={UpdatePersonalInfo} />
             </Stack.Navigator>
           </NavigationContainer>
-        </AuthProvider>
       </ToastProvider>
     </ApplicationProvider>
     </UserProvider>

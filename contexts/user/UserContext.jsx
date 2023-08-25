@@ -7,7 +7,7 @@ function userReducer(user, action) {
       return action.payload;
     }
     case 'reset': {
-      return user;
+      return initialUser;
     }
     case 'update-type': {
       return {
