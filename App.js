@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { ToastProvider } from 'react-native-toast-notifications'
 import Home from './screens/Home';
-import Login from './screens/Login';
-import SignUp from './screens/SignUp';
+import Login from './screens/login/Login';
+import SignUp from './screens/signup/SignUp';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Dashboard from './screens/Dashboard';
@@ -28,6 +28,7 @@ import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
 import { default as theme } from './utils/theme/theme.json';
 import { UserProvider } from './contexts/user/UserContext';
+import SignUpUserProfile from './screens/v2/SignUpProfiles';
 
 export default function App() {
 
@@ -45,7 +46,7 @@ export default function App() {
               <Stack.Screen options={{ headerShown: false }} name="ReportEmergency" component={ReportEmergency} />
               <Stack.Screen options={{ headerShown: false }} name="ReportCovidCase" component={ReportCovidCase} />
               <Stack.Screen options={{ headerShown: false }} name="QrScanner" component={QrScanner} />
-              <Stack.Screen options={{ headerShown: false }} name="SignUpUserCredentialsStudent" component={SignUpUserCredentialsStudent} />
+              <Stack.Screen options={{ headerShown: false }} name="SignUpUserCredentialsStudent" component={SignUpUserProfile} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpUserCredentialsEmployee" component={SignUpUserCredentialsEmployee} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpUserCredentialsVisitor" component={SignUpUserCredentialsVisitor} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpUserType" component={SignUpUserType} />
