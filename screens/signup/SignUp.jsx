@@ -13,145 +13,101 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Loading from "../../Components/loading/Loading";
 import Succes from "../../Components/success/Succes";
 import TypeSelect from "../../Components/type/TypeSelect";
-import { useUserDispatch } from "../../contexts/user/UserContext";
+import { useUser, useUserDispatch } from "../../contexts/user/UserContext";
 import { genericPostRequest } from "../../services/genericPostRequest";
-import { DEFAULT_ERROR_MESSAGE, UserTypes } from "../../utils/app_constants";
 import { useFormik } from "formik";
 import { SignUpSchema } from "./schemas/SignUpSchema";
+import { UserTypes } from "../../utils/app_constants";
+import { Alert } from "react-native";
 
 const SignUp = ({ navigation, route }) => {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-	const [selectedType, setSelectedType] = useState(route.params.type)
+	const loadingMessage = "Registering please wait..."
 	const userDispatch = useUserDispatch()
+	const user = useUser()
+	const [showSuccessModal, setShowSuccessModal] = useState(false)
+	const [showLoadingModal, setShowLoadingModal] = useState(false)
 
 	const formik = useFormik({
 		initialValues: {
-			type: UserTypes.STUDENT,
+			type: route.params.type,
 			email: '',
-			password: ''
+			password: '',
+			confirmPassword: '',
+			termsAndConditions: false,
 		},
 		validationSchema: SignUpSchema,
-		onSubmit: () => {
-			
+		onSubmit: async (values) => {
+			const data = {
+				email: values.email,
+				password: values.password,
+				type: values.type
+			  };
+			  setShowLoadingModal(true)
+			  await genericPostRequest('/auth/signup', data)
+			  .then((response) => {
+				  const data = response
+				  const user = data['user']
+				  userDispatch({ 
+					  type: 'update', 
+					  payload: { 
+						  id: user.sub, 
+						  type: user.type, 
+						  email: user.email, 
+						  token: data['access_token'],
+						  verified: user.verified,
+						  status: 'authenticated'
+					  }
+				  })
+				  setShowSuccessModal(true)
+			  })
+			  .catch((error) => {
+				  setShowLoadingModal(false);
+				  if (error.response.status === 409) {
+					  Alert.alert('User already exists', 'Please use a different email', [
+						{ text: 'OK' },
+					  ]);
+					  userDispatch({ type: 'reset' })
+					  return 
+				  }
+				  Alert.alert('Internal server error', 'Please contact admin if issue persits', [
+					{ text: 'OK' },
+				  ]);
+			  })
+			  .finally(() => {
+				  setShowLoadingModal(false);
+			  })
 		}
 	})
 
-	const [error, setError] = useState(false);
-	const [errorMessage, setErrorMessage] = useState("");
-	const [agreeWithTermsAndCondition, setAgreeWithTermsAndCondition] = useState(false)
-	const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-	const [showLoadingModal, setShowLoadingModal] = useState(false)
-	const [loadingMessage, setLoadingMessage] = useState('Please wait...')
-
-
-
-	const signUpNow = async () => {
-		if (!agreeWithTermsAndCondition) {
-		  setError(true);
-		  setErrorMessage("Please agree with our app terms and conditions");
-		  return;
-		}
-	  
-		if (email === "") {
-		  setError(true);
-		  setErrorMessage("Please input your email address");
-		  return;
-		}
-	  
-		const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	  
-		if (!emailRegex.test(email)) {
-		  setError(true);
-		  setErrorMessage("Invalid email address");
-		  return;
-		}
-	  
-		if (password === "") {
-		  setError(true);
-		  setErrorMessage("Please input password");
-		  return;
-		}
-	  
-		if (password.length < 8) {
-		  setError(true);
-		  setErrorMessage("Password field requires a minimum of 8 characters");
-		  return;
-		}
-	  
-		if (password !== confirmPassword) {
-		  setError(true);
-		  setErrorMessage("Confirm password did not match!");
-		  return;
-		}
-	  
-		setShowLoadingModal(true);
-		setLoadingMessage('Please wait while creating your account...');
-	  
-		const data = {
-		  email: email,
-		  password: password,
-		  type: selectedType
-		};
-
-		await genericPostRequest('/auth/signup', data)
-		.then((response) => {
-			const data = response
-			const user = data['user']
-			userDispatch({ 
-				type: 'update', 
-			    payload: { 
-					id: user.sub, 
-					type: user.type, 
-					email: user.email, 
-					token: data['access_token'],
-					verified: user.verified,
-					status: 'authenticated'
-				}
-			})
-			setLoadingMessage('Logging in...');
-			redirect(user.verified)
-		})
-		.catch((error) => {
-			setShowLoadingModal(false);
-			if (error.response.status === 409) {
-				alert('User already exists')
-				userDispatch({ type: 'reset' })
-				return 
-			}
-			if (error.response.status === 401) {
-				alert('Invalid creadentials')
-				userDispatch({ type: 'reset' })
-				return 
-			}
-			console.log(error)
-			alert(DEFAULT_ERROR_MESSAGE);
-		})
-		.finally(() => {
-			setShowLoadingModal(false);
-			setError(false)
-		    setLoadingMessage('');
-		})
-	  
-	}
-
 	const redirect = (verified) => {
+		setShowSuccessModal(false)
 		if (!verified) {
 			const typeToRoute = {
 			  [UserTypes.STUDENT]: "SignUpUserCredentialsStudent",
 			  [UserTypes.EMPLOYEE]: "SignUpUserCredentialsEmployee",
 			  [UserTypes.VISITOR]: "SignUpUserCredentialsVisitor",
 			};
-			  
-			const route = typeToRoute[selectedType];
+
+			const route = typeToRoute[formik.values.type];
 			if (route) {
-			  return navigation.navigate(route, { type: selectedType });
+			  return navigation.navigate(route, { type: formik.values.type });
 			}
 		}
 		navigation.navigate("Dashboard");
 	}
+
+	const handleInputTextChange = (type, name) => {
+		formik.setFieldValue(name, type)
+	}
+
+	const handleInputTextBlur = (name) => {
+		formik.setFieldTouched(name)
+	}
+
+	const hasEmailError = !!formik.errors.email && formik.touched.email
+	const hasPasswordError = !!formik.errors.password && formik.touched.password
+	const hasConfirmPasswordError = !!formik.errors.confirmPassword && formik.touched.confirmPassword
+	const hasTermsAndConditionsError = !!formik.errors.termsAndConditions && formik.touched.termsAndConditions
 
 	return (
 		<SafeAreaView style={styles.root}>
@@ -160,53 +116,63 @@ const SignUp = ({ navigation, route }) => {
 			  onClose={() => setShowLoadingModal(!showLoadingModal)}
 			  message={loadingMessage}
 			/>
-			<Succes open={showSuccessModal} onContinue={() => handleLoginUser(email, confirmPassword)} />
+			<Succes open={showSuccessModal} onContinue={() => redirect(user.verified)} />
 			<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
 			<KeyboardAvoidingView style={styles.container} behavior='height'>
 				<View style={styles.inputContainer}>
 					<Text style={styles.header}>Sign Up</Text>
 					<TypeSelect
 					  type={formik.values.type}
-					  onChangeType={() => console.log('Hello')}
+					  onSelectType={(type) => handleInputTextChange(type, 'type')}
 					/>
 					<Text style={styles.label}>Email</Text>
 						<TextInput
 							placeholder="Email Address"
-							defaultValue={email}
-							onChangeText={(text) => setEmail(text)}
-							style={styles.input}
+							value={formik.values.email}
+							onChangeText={(text) => handleInputTextChange(text, 'email')}
+							onBlur={() => handleInputTextBlur('email')}
+							style={hasEmailError ? styles.errorInput : styles.input}
 						/>
+						{hasEmailError && <Text style={styles.errorLabel}>*{formik.errors.email}</Text>}
 					<Text style={styles.label}>Password</Text>
 						<TextInput
 							placeholder="Password"
-							defaultValue={password}
-							onChangeText={(text) => setPassword(text)}
-							style={styles.input}
+							value={formik.values.password}
+							onChangeText={(text) => handleInputTextChange(text, 'password')}
+							onBlur={() => handleInputTextBlur('password')}
+							style={hasPasswordError ? styles.errorInput : styles.input}
 							secureTextEntry
 						/>
+						{hasPasswordError && <Text style={styles.errorLabel}>*{formik.errors.password}</Text>}
 
 					<Text style={styles.label}>Confirm Password</Text>
 						<TextInput
 							placeholder="Confirm Password"
-							defaultValue={confirmPassword}
-							onChangeText={(text) => setConfirmPassword(text)}
-							style={styles.input}
+							value={formik.values.confirmPassword}
+							onChangeText={(text) => handleInputTextChange(text, 'confirmPassword')}
+							onBlur={() => handleInputTextBlur('confirmPassword')}
+							style={hasConfirmPasswordError ? styles.errorInput : styles.input}
 							secureTextEntry
 						/>
+						{hasConfirmPasswordError && <Text style={styles.errorLabel}>*{formik.errors.confirmPassword}</Text>}
 
-					{error && <Text style={styles.errorMessage}>*{errorMessage}</Text>}
 					<View style={{ display: 'flex', flexDirection: 'row', marginVertical: 15 }}>
 						<Checkbox
-							value={agreeWithTermsAndCondition}
-							onValueChange={() => setAgreeWithTermsAndCondition(!agreeWithTermsAndCondition)}
-							style={{ marginHorizontal: 10 }}
+							value={formik.values.termsAndConditions}
+							onValueChange={() => handleInputTextChange(!formik.values.termsAndConditions, 'termsAndConditions')}
+							style={hasTermsAndConditionsError
+								? { marginLeft: 5, marginRight: 10, borderColor: 'red' }
+								: { marginLeft: 5, marginRight: 10 }
+							}
 						/>
 						<Text style={{ color: '#4d7861' }} onPress={() => navigation.navigate('TermsAndCondition')}>Agree with our Terms and conditions</Text>
 					</View>
+					{hasTermsAndConditionsError && <Text style={styles.errorLabel}>*{formik.errors.termsAndConditions}</Text>}
 
 					<TouchableOpacity
-						onPress={signUpNow}
+						onPress={formik.handleSubmit}
 						style={styles.button}
+						disabled={formik.isSubmitting}
 					>
 						<Text style={styles.buttonText}>Sign Up</Text>
 					</TouchableOpacity>
@@ -308,6 +274,10 @@ const styles = StyleSheet.create({
 	label: {
 		color: "#4d7861"
 	},
+	errorLabel: {
+		color: "red",
+		marginBottom: 12
+	},
 	input: {
 		marginTop: 5,
 		marginBottom: 5,
@@ -316,6 +286,23 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: 50,
 		borderColor: "#28CD41",
+		paddingHorizontal: 15,
+		borderWidth: 1,
+		borderRadius: 10,
+		overflow: "hidden",
+		paddingVertical: 1,
+		fontSize: 16,
+		color: "#4d7861",
+		backgroundColor: "#ffff",
+	},
+	errorInput: {
+		marginTop: 5,
+		marginBottom: 5,
+		marginLeft: 0,
+		marginRight: 0,
+		width: "100%",
+		height: 50,
+		borderColor: "red",
 		paddingHorizontal: 15,
 		borderWidth: 1,
 		borderRadius: 10,

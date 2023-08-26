@@ -1,46 +1,79 @@
 import React from 'react'
+import { TouchableOpacity } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import ModalSuccess from "react-native-modal";
 import {
-	StyleSheet,
 	View,
-	TouchableOpacity,
 	Text,
+	Modal,
+    StyleSheet
 } from "react-native";
 
-export default function Succes({ open, onContinue }) {
+export default function Success({ open, onContinue }) {
   return (
-    <ModalSuccess isVisible={open}>
-        <View style={styles.root}>
-            <Text style={styles.signUpHeader}> Sign Up {'\n'}Successful</Text>
-            <Text style={styles.signUpSubHeader}> Awesome, you will now being {'\n'} redirected to user profiling area</Text>
-            <TouchableOpacity style={styles.buttonContinue}
+    <Modal
+        animationType="fade"
+        transparent={true}
+        visible={open}
+        onRequestClose={onContinue}>
+        <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+             <Text style={styles.signUpHeader}> Sign Up Successful</Text>
+             <Text style={styles.signUpSubHeader}> Awesome, you will now being redirected to user profiling area</Text>
+             <TouchableOpacity style={styles.buttonContinue}
                 onPress={onContinue} >
                 <Text style={styles.buttonText}>Continue</Text>
             </TouchableOpacity>
+            </View>
+            <ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut='true' />
         </View>
-        <ConfettiCannon count={200} origin={{ x: 0, y: 0 }} fadeOut='true' />
-    </ModalSuccess>
+    </Modal>
   )
 }
 
 const styles = StyleSheet.create({
-   root: { 
-     width: 348, 
-     height: 227, 
-     backgroundColor: 'white', 
-     alignSelf: 'center', 
-     alignItems: 'center', 
-     paddingVertical: 20,
-     borderRadius: 15
-   },
-   signUpHeader: { 
+	centeredView: {
+		flex: 1,
+		backgroundColor: "rgba(52, 52, 52, 0.3)",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	modalView: {
+		backgroundColor: "white",
+		borderRadius: 20,
+		padding: 35,
+		alignItems: "center",
+		shadowColor: "#000",
+		width: 340,
+		height: 'auto',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 5,
+	},
+
+	modalButton: {
+		width: 80,
+		height: 60,
+		borderRadius: 20,
+		elevation: 2,
+		marginTop: 25,
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "#28CD41",
+		borderWidth: 1
+	},
+  signUpHeader: { 
     fontSize: 28, 
     fontWeight: '700', 
     color: '#29CC42'
   },
   signUpSubHeader: { 
-    fontSize: 14, 
+    fontSize: 14,
+    marginVertical: 10,
+    textAlign: 'center',
     fontWeight: '400',
     color: '#364D39', 
     lineHeight: 19.5
@@ -50,7 +83,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     paddingVertical: 18,
-    marginVertical: 15,
     width: 308,
     height: 60,
   },

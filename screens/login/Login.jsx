@@ -51,7 +51,6 @@ const Login = ({ navigation }) => {
 						  status: 'authenticated'
 					  }
 				  })
-				  setLoadingMessage('Logging in...');
 				  redirect(user.verified)
 			  })
 			  .catch((error) => {
@@ -85,9 +84,9 @@ const Login = ({ navigation }) => {
 			  [UserTypes.VISITOR]: "SignUpUserCredentialsVisitor",
 			};
 			  
-			const route = typeToRoute[selectedType];
+			const route = typeToRoute[formik.values.type];
 			if (route) {
-			  return navigation.navigate(route, { type: selectedType });
+			  return navigation.navigate(route, { type: formik.values.type });
 			}
 		}
 		navigation.navigate("Dashboard");
