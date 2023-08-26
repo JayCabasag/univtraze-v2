@@ -74,7 +74,7 @@ const Login = ({ navigation }) => {
 	})
 
 	const [showLoadingModal, setShowLoadingModal] = useState(false)
-	const [loadingMessage, setLoadingMessage] = useState("Verifying please wait...")
+	const [loadingMessage, setLoadingMessage] = useState("Logging in please wait...")
 
 	const redirect = (verified) => {
 		if (!verified) {

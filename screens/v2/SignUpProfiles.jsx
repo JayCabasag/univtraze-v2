@@ -13,41 +13,47 @@ import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StackActions } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
-import moment from "moment";
 import { useFormik } from "formik";
 import { ProfileValidationSchema } from "./schemas/SignUpProfileSchema";
+import { format } from "date-fns";
 
 export const SignUpUserProfile = ({ navigation, route }) => {
 
+	const [showDatePicker, setShowDatePicker] = useState(false)
+	const today = new Date();
+
 	const formik = useFormik({
 		initialValues: {
-		  type: '',
+		  type: route.params.type,
 		  firstName: '',
 		  middleName: '',
 		  lastName: '',
 		  suffix: '',
 		  gender: '',
           address: '',
-		  dateOfBirth: ''
+		  dateOfBirth: today
 		},
 		validationSchema: ProfileValidationSchema,
 		onSubmit: values => {
-		  alert(JSON.stringify(values, null, 2));
+		  
 		},
-	  });
-	  
-	const nextScreen = async () => {
-	
+	});
+
+	const handleInputTextChange = (type, name) => {
+		formik.setFieldValue(name, type)
 	}
 
-	const handleInputTextChange = (value, name) => {
-		// formik.setFieldValue(name, value)
-		console.log(value, name)
+	const handleInputTextBlur = (name) => {
+		formik.setFieldTouched(name)
 	}
 
-	const hasFirstNameError = !!formik.errors.firstName
+	const hasFirstNameError = !!formik.errors.firstName && formik.touched.firstName
+	const hasMiddleNameError = !!formik.errors.middleName && formik.touched.middleName
+	const hasLastnameError = !!formik.errors.lastName && formik.touched.lastName
+	const hasGenderError = !!formik.errors.gender && formik.touched.gender
+	const hasAddressError = !!formik.errors.address && formik.touched.address
+	const hasDateOfBirthError = !!formik.errors.dateOfBirth && formik.touched.dateOfBirth
 
 	return (
 		<SafeAreaView>
@@ -72,9 +78,10 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 							placeholder="First name"
 							value={formik.values.firstName}
 							onChangeText={(text) => handleInputTextChange(text, 'firstName')}
-							onBlur={formik.handleBlur}
+							onBlur={() => handleInputTextBlur('firstName')}
 							style={hasFirstNameError ? styles.errorInput : styles.input}
 						/>
+						{hasFirstNameError && <Text style={styles.errorLabel}>*{formik.errors.firstName}</Text>}
 					</View>
 
 					<View
@@ -83,25 +90,26 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 						<Text style={styles.label}>Middle name </Text>
 						<TextInput
 							placeholder="Middle name"
-							value={formik.values.lastName}
-							onChangeText={(text) => handleInputTextChange(text, 'lastName')}
-							onBlur={formik.handleBlur}
-							style={hasFirstNameError ? styles.errorInput : styles.input}
+							value={formik.values.middleName}
+							onChangeText={(text) => handleInputTextChange(text, 'middleName')}
+							onBlur={() => handleInputTextBlur('middleName')}
+							style={hasMiddleNameError ? styles.errorInput : styles.input}
 						/>
+						{hasMiddleNameError && <Text style={styles.errorLabel}>*{formik.errors.middleName}</Text>}
 					</View>
 
-					{/* <View
+					<View
 						style={{ width: "100%", alignItems: "center", borderRadius: 15 }}
 					>
 						<Text style={styles.label}>Last name</Text>
 						<TextInput
 							placeholder="Last name"
-							defaultValue={""}
-							onChangeText={(text) => {
-								setLastName(text);
-							}}
-							style={styles.input}
+							value={formik.values.lastName}
+							onChangeText={(text) => handleInputTextChange(text, 'lastName')}
+							onBlur={() => handleInputTextBlur('lastName')}
+							style={hasLastnameError ? styles.errorInput : styles.input}
 						/>
+						{hasLastnameError && <Text style={styles.errorLabel}>*{formik.errors.lastName}</Text>}
 					</View>
 
 					<View
@@ -112,28 +120,39 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 								<Text style={styles.label}>Suffix </Text>
 								<TextInput
 									placeholder="Suffix"
-									defaultValue={""}
-									onChangeText={(text) => {
-										setSuffix(text);
-									}}
+									value={formik.values.suffix}
+									onChangeText={(text) => handleInputTextChange(text, 'suffix')}
+									onBlur={() => handleInputTextBlur('suffix')}		
 									style={styles.suffixInput}
 								/>
 							</View>
 
-							<View style={{ width: "50%" }}>
+							<View style={{ width: "50%", borderRadius: 15 }}>
 								<Text style={styles.label}>Gender </Text>
-								<Picker
-									style={{
-										width: "100%",
-										height: 50, color: "#4d7861"
-									}}
-									selectedValue={gender}
-									onValueChange={value => setGender(value)}
-									mode="dialog">
-									<Picker.Item label="Rather not say" value="Rather not say" />
-									<Picker.Item label="Male" value="Male" />
-									<Picker.Item label="Female" value="Female" />
-								</Picker>
+								<View style={formik.errors.gender ? styles.genderPickerError : styles.genderPicker}>
+									<Picker
+										style={{
+											width: "100%",
+											height: 48.5,
+											color: "#4d7861",
+											borderColor: "#28CD41",
+											backgroundColor: 'white',
+										}}
+										itemStyle={{
+											borderWidth: 2,
+											borderColor: "#28CD41",
+										}}
+										selectedValue={formik.values.gender}
+										onValueChange={value => {
+											handleInputTextChange(value, 'gender')
+											handleInputTextBlur('gender')
+										}}
+										mode="dialog">
+										<Picker.Item label="Rather not say" value="Rather not say" />
+										<Picker.Item label="Male" value="Male" />
+										<Picker.Item label="Female" value="Female" />
+									</Picker>
+								</View>
 							</View>
 						</View>
 
@@ -145,83 +164,44 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 						<Text style={styles.label}>Address</Text>
 						<TextInput
 							placeholder="Address"
-							defaultValue={""}
-							onChangeText={(text) => {
-								setAddress(text);
-							}}
-							style={styles.input}
+							value={formik.values.address}
+							onChangeText={(text) => handleInputTextChange(text, 'address')}
+							onBlur={() => handleInputTextBlur('address')}
+							style={hasLastnameError ? styles.errorInput : styles.input}
 						/>
+						{hasAddressError && <Text style={styles.errorLabel}>*{formik.errors.address}</Text>}
 					</View>
 
 					<View
 						style={{ width: "100%", alignItems: "center", borderRadius: 15 }}
 					>
 						<Text style={styles.label}>Date of birth</Text>
-
 						<View style={{ width: "100%", alignItems: "center", justifyContent: "center", flexDirection: "row" }}>
 							<TextInput
 								placeholder="Date of birth"
-								defaultValue={moment(dateOfBirth).format("yyyy-MM-DD")}
-								style={styles.dobInput}
+								type="date"
+								key={format(formik.values.dateOfBirth, 'MM-dd-yyyy')}
+								value={format(formik.values.dateOfBirth, 'MM-dd-yyyy')}
+								style={hasDateOfBirthError ? styles.dobInputError : styles.dobInput}
 								editable={false}
 							/>
 							<AntDesign name="calendar" size={37} color="#28CD41" style={{ marginRight: 5 }} onPress={() => setShowDatePicker(true)} />
 						</View>
-
+					    {hasDateOfBirthError && <Text style={styles.errorLabel}>*{formik.errors.dateOfBirth}</Text>}
 					</View>
 
-					{
-						showDatePicker === true ?
-							<DateTimePicker
-								value={dateOfBirth}
-								mode={"date"}
-								is24Hour={true}
-								onChange={(event, date) => {
-									setShowDatePicker(false)
-									setDateOfBirth(new Date(date))
-								}
-								}
-							/>
-							:
-							null
-					}
-
-					<View
-						style={{ width: "100%", borderRadius: 15, alignItems: 'center' }}
-					>
-						<View style={{ width: "80%", flexDirection: "row" }}>
-							<View style={{ width: "50%" }}>
-								<Text style={styles.label}>Department</Text>
-								<TextInput
-									placeholder="Department"
-									defaultValue={""}
-									onChangeText={(text) => {
-										setDepartment(text);
-									}}
-									style={styles.courseInput}
-								/>
-							</View>
-
-							<View style={{ width: "50%" }}>
-								<Text style={styles.label}>Position </Text>
-								<TextInput
-									placeholder="Position"
-									defaultValue={""}
-									onChangeText={(text) => {
-										setPosition(text);
-									}}
-									style={styles.yearAndSectionInput}
-								/>
-							</View>
-						</View>
-
-					</View>
-
-					{
-						error ?
-							<Text style={styles.errorMessage}>*{errorMessage}</Text>
-							:
-							<Text style={styles.errorMessage}></Text>
+					{showDatePicker  &&
+						<DateTimePicker
+							value={formik.values.dateOfBirth}
+							mode={"date"}
+							is24Hour={true}
+							onChange={(_, date) => {
+								setShowDatePicker(false)
+								handleInputTextChange(date, 'dateOfBirth')
+								handleInputTextBlur('dateOfBirth')
+							 }
+							}
+						/>
 					}
 
 					<View
@@ -229,6 +209,7 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 							flexDirection: "row",
 							justifyContent: "center",
 							marginBottom: 20,
+							marginTop: 30
 						}}
 					>
 						<TouchableOpacity
@@ -238,21 +219,18 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 							style={styles.backbutton}
 						>
 							<Image
-								source={require("../assets/back-icon.png")}
+								source={require("../../assets/back-icon.png")}
 								style={{ width: 60, height: 60 }}
 							/>
 						</TouchableOpacity>
 
 						<TouchableOpacity
-							onPress={() => {
-								nextScreen();
-							}}
+							onPress={formik.handleSubmit}
 							style={styles.button}
 						>
 							<Text style={styles.buttonText}>Next</Text>
 						</TouchableOpacity>
-					</View> */}
-
+					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
@@ -280,6 +258,12 @@ const styles = StyleSheet.create({
 	label: {
 		width: "80%",
 		textAlign: "left",
+	},
+	errorLabel: {
+		width: "80%",
+		textAlign: "left",
+		color: "red",
+		marginBottom: 12
 	},
 	errorMessage: {
 		alignSelf: "center",
@@ -347,24 +331,28 @@ const styles = StyleSheet.create({
 		color: "#4d7861",
 		backgroundColor: "#ffff",
 	},
-	genderInput: {
-		marginTop: 5,
-		marginBottom: 5,
-		marginLeft: 0,
-		marginRight: 0,
-		width: "100%",
-		height: 50,
-		borderColor: "#28CD41",
-		paddingHorizontal: 15,
+	genderPicker: {
 		borderWidth: 1,
 		borderRadius: 10,
-		overflow: "hidden",
-		paddingVertical: 1,
-		fontSize: 16,
-		color: "#4d7861",
-		backgroundColor: "#ffff",
+		overflow: 'hidden',
+		marginTop: 5,
+		borderColor: "#28CD41",
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center'
 	},
-
+	genderPickerError: {
+		borderWidth: 1,
+		borderRadius: 10,
+		overflow: 'hidden',
+		marginTop: 5,
+		borderColor: "red",
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
 	courseInput: {
 		marginTop: 5,
 		marginBottom: 5,
@@ -404,6 +392,20 @@ const styles = StyleSheet.create({
 		width: "70%",
 		height: 50,
 		borderColor: "#28CD41",
+		paddingHorizontal: 15,
+		borderWidth: 1,
+		borderRadius: 10,
+		overflow: "hidden",
+		paddingVertical: 1,
+		fontSize: 16,
+		color: "#4d7861",
+		backgroundColor: "#ffff",
+	},
+	dobInputError: {
+		margin: 5,
+		width: "70%",
+		height: 50,
+		borderColor: "red",
 		paddingHorizontal: 15,
 		borderWidth: 1,
 		borderRadius: 10,
