@@ -13,17 +13,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { DEFAULT_ERROR_MESSAGE, UserTypes } from "../../utils/app_constants";
 import Loading from "../../Components/loading/Loading";
 import TypeSelect from "../../Components/type/TypeSelect";
-import { isEmail } from "../../utils/regex";
 import { genericPostRequest } from "../../services/genericPostRequest";
 import { useUserDispatch } from "../../contexts/user/UserContext";
 import { useFormik } from "formik";
 import { LoginSchema  } from './schemas/LoginSchema'
+import { Alert } from "react-native";
 
 const Login = ({ navigation }) => {
-	const [error, setError] = useState(false);
-	const [errorMessage, setErrorMessage] = useState("");
-	const [emailInput, setEmailInput] = useState("");
-	const [passwordInput, setPasswordInput] = useState("");
 	const userDispatch = useUserDispatch()
 
 	const formik = useFormik({
@@ -33,66 +29,53 @@ const Login = ({ navigation }) => {
 			password: ''
 		},
 		validationSchema: LoginSchema,
-		onSubmit: () => {
-			
+		onSubmit: async (values) => {
+			  const data = {
+				email: values.email,
+				password: values.password,
+				type: values.type
+			  };
+			  setShowLoadingModal(true)
+			  await genericPostRequest('/auth/signin', data)
+			  .then((response) => {
+				  const data = response
+				  const user = data['user']
+				  userDispatch({ 
+					  type: 'update', 
+					  payload: { 
+						  id: user.sub, 
+						  type: user.type, 
+						  email: user.email, 
+						  token: data['access_token'],
+						  verified: user.verified,
+						  status: 'authenticated'
+					  }
+				  })
+				  setLoadingMessage('Logging in...');
+				  redirect(user.verified)
+			  })
+			  .catch((error) => {
+				  setShowLoadingModal(false);
+				  if (error.response.status === 409 || error.response.status === 401) {
+					  Alert.alert('Invalid Credentials', 'Make sure your email and password is correct', [
+						{ text: 'OK' },
+					  ]);
+					  userDispatch({ type: 'reset' })
+					  return 
+				  }
+
+				  Alert.alert('Internal server error', 'Contact admin if issue persits', [
+					{ text: 'OK' },
+				  ]);
+			  })
+			  .finally(() => {
+				  setShowLoadingModal(false);
+			  })
 		}
 	})
 
-	//Variables for loading
-
 	const [showLoadingModal, setShowLoadingModal] = useState(false)
-	const [loadingMessage, setLoadingMessage] = useState("Please wait...")
-
-	const loginNow = async () => {
-		setShowLoadingModal(true);
-		setLoadingMessage('Validating your credentials...');
-	  
-		const data = {
-		  email: formik.values.email,
-		  password: formik.values.password,
-		  type: formik.values.type
-		};
-		
-		await genericPostRequest('/auth/signin', data)
-		.then((response) => {
-			const data = response
-			const user = data['user']
-			userDispatch({ 
-				type: 'update', 
-			    payload: { 
-					id: user.sub, 
-					type: user.type, 
-					email: user.email, 
-					token: data['access_token'],
-					verified: user.verified,
-					status: 'authenticated'
-				}
-			})
-			setLoadingMessage('Logging in...');
-			redirect(user.verified)
-		})
-		.catch((error) => {
-			setShowLoadingModal(false);
-			if (error.response.status === 409) {
-				alert('User with this email already exists')
-				userDispatch({ type: 'reset' })
-				return 
-			}
-
-			if (error.response.status === 401) {
-				alert('Invalid credentials')
-				userDispatch({ type: 'reset'})
-				return 
-			}
-			console.log(error)
-			alert(DEFAULT_ERROR_MESSAGE);
-		})
-		.finally(() => {
-			setShowLoadingModal(false);
-			setError(false)
-		    setLoadingMessage('');
-		})
-	};
+	const [loadingMessage, setLoadingMessage] = useState("Verifying please wait...")
 
 	const redirect = (verified) => {
 		if (!verified) {
@@ -147,7 +130,7 @@ const Login = ({ navigation }) => {
 						onBlur={() => handleInputTextBlur('email')}
 						style={hasEmailError ? styles.errorInput : styles.input}
 					/>
-					{hasEmailError && <Text style={styles.errorLabel}>{formik.errors.email}</Text>}
+					{hasEmailError && <Text style={styles.errorLabel}>*{formik.errors.email}</Text>}
 
 					<Text style={styles.label}>Password</Text>
 					  <TextInput
@@ -158,15 +141,13 @@ const Login = ({ navigation }) => {
 						style={hasPasswordError ? styles.errorInput : styles.input}
 						secureTextEntry
 					  />
-					{hasPasswordError && <Text style={styles.errorLabel}>{formik.errors.password}</Text>}
-
-					{error && <Text style={styles.errorMessage}>*{errorMessage}</Text> }
+					{hasPasswordError && <Text style={styles.errorLabel}>*{formik.errors.password}</Text>}
 
 					<Text style={styles.forgotPassword} onPress={() => {
 						navigation.navigate('ForgotPassword')
 					}}>Forgot Password?</Text>
 
-                    <TouchableOpacity onPress={() => loginNow()} style={styles.button}>
+                    <TouchableOpacity disabled={formik.isSubmitting} onPress={formik.handleSubmit} style={styles.button}>
 						<Text style={styles.buttonText}>Log in</Text>
 					</TouchableOpacity>
 				</View>

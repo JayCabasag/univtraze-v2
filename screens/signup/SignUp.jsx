@@ -16,6 +16,8 @@ import TypeSelect from "../../Components/type/TypeSelect";
 import { useUserDispatch } from "../../contexts/user/UserContext";
 import { genericPostRequest } from "../../services/genericPostRequest";
 import { DEFAULT_ERROR_MESSAGE, UserTypes } from "../../utils/app_constants";
+import { useFormik } from "formik";
+import { SignUpSchema } from "./schemas/SignUpSchema";
 
 const SignUp = ({ navigation, route }) => {
 	const [email, setEmail] = useState("");
