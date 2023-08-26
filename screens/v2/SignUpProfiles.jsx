@@ -30,7 +30,7 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 		  middleName: '',
 		  lastName: '',
 		  suffix: '',
-		  gender: '',
+		  gender: 'Rather not say',
           address: '',
 		  dateOfBirth: today
 		},
