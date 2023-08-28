@@ -13,263 +13,84 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { PieChart } from "react-native-chart-kit";
 import moment from "moment";
-import * as SecureStore from "expo-secure-store";
-import jwtDecode from "jwt-decode";
-import Menu from "../Components/menu/Menu";
+import Menu from "../Components/bottom-drawer/BottomDrawer";
 import Notifications from "../Components/notifications/Notifications";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PRODUCTION_SERVER } from "../services/configs";
-import { DEFAULT_ERROR_MESSAGE } from "../utils/app_constants";
+import { genericGetRequest } from '../services/genericGetRequest'
+import { useUser } from '../contexts/user/UserContext'
+import BottomDrawer from "../Components/bottom-drawer/BottomDrawer";
 
 const Dashboard = ({ navigation, route }) => {
+	const { id, type, token } = useUser()
+	const [userProfile, setUserProfile] = useState(null)
+	const fullname = `${userProfile?.['first_name'] ?? ''} ${userProfile?.['last_name'] ?? ''}`
+	const [population, setPopulation] = useState(0)
+	const [cases, setCases] = useState(0)
 
-	//covid api variables
-	const [population, setPopulation] = useState(0);
-	const [cases, setCases] = useState(0);
-	const [activeCases, setActiveCases] = useState(0);
-	const [recovered, setRecovered] = useState(0);
-	const [deaths, setDeaths] = useState(0);
+	useEffect(() => {
+	  const getUserProfile = async () => {
+		if (!id) return
+		if (!token) return
+		await genericGetRequest(`/users/${id}`, token)
+		.then((response) => {
+			setUserProfile(response.profile)
+		})
+		.catch((error) => {
+	     console.log(error)
+		})
+		return
+	  }
+	  getUserProfile()
+	  return () => {}
+	}, [id, token])
 
-	//userdata variables
-	const [fullname, setFullname] = useState('')
-	const [type, setType] = useState('')
-	const [userId, setUserId] = useState(null)
-	const [profileUrl, setProfileUrl] = useState('')
+	const [openBottomDrawer, setOpenBottomDrawer] = useState(false)
 
-	// 
-	const [notificationLists, setNotificationLists] = useState([])
-
-	const [reportedCommunicableDiseaseOnGoing, setReportedCommunicableDiseaseOnGoing] = useState([])
-	const [reportedCommunicableDiseaseResolved, setReportedCommunicableDiseaseResolved] = useState([])
-
-	//Special variables
-	const [token, setToken] = useState("");
-	const [notificationCounts, setNotificationCounts] = useState(0);
 	const [visible, setVisible] = useState(false);
 	const [notifVisible, setNotifVisible] = useState(false);
+	const [recovered, setRecovered] = useState(0)
+	const [activeCases, setActiveCases] = useState(0)
+	const [deaths, setDeaths] = useState(0)
+
+	// useEffect(() => {
+	// 	const GetCovidUpdate = () => {
+	// 		axios
+	// 			.get("https://disease.sh/v3/covid-19/countries/PH?strict=true")
+	// 			.then((response) => {
+	// 				setPopulation(response.data.population);
+	// 				setActiveCases(response.data.active);
+	// 				setCases(response.data.cases);
+	// 				setRecovered(response.data.recovered);
+	// 				setDeaths(response.data.deaths);
+	// 			});
+	// 	};
+	// 	GetCovidUpdate();
+	// }, []);
 
 	const toggleBottomNavigationView = () => {
 		//Toggling the visibility state of the bottom sheet
-		setVisible(!visible);
+		setOpenBottomDrawer(!openBottomDrawer)
 	};
+
+	console.log(visible)
 
 	const toggleNotifNavigationView = () => {
 		//Toggling the visibility state of the bottom sheet
 		getTotalActiveNotifications(token)
 		setNotifVisible(!notifVisible);
-		handleUpdateNotificationStatus(userId, 1, token)
-		handleGetNotifications(userId, 0, token)
 	};
-
-	useEffect(() => {
-		getValueFor("x-token");
-	}, [])
-
-	async function getValueFor(key) {
-		let result = await SecureStore.getItemAsync(key);
-		if (result) {
-			setToken(result);
-			decodeJwt(result)
-			getOnGoingCommunicableDiseaseCase(result)
-			getResolvedCommunicableDiseaseCase(result)
-			getTotalActiveNotifications(result)
-		} else {
-			alert("No values stored under that jwt-token.");
-		}
-	}
-
-	const handleUpdateNotificationStatus = async (userId, notification_is_viewed, currentToken) => {
-		const config = {
-			headers: { Authorization: `Bearer ${currentToken}` }
-		};
-
-		const data = {
-			notification_is_viewed: 1,
-			notification_for: userId
-		}
-
-		await axios.post(`${PRODUCTION_SERVER}/notifications/updateUserNotificationStatus `, data, config)
-			.then((response) => {
-
-				const success = response.data.success;
-
-				if (success === 0) {
-					return
-				}
-
-				if (success === 1) {
-					return
-				}
-
-				alert('Something went wrong... Please try again')
-
-			});
-
-
-
-	}
-
-	const decodeJwt = (currentToken) => {
-		var decodedToken = jwtDecode(currentToken);
-		getUserDetails(decodedToken.result.id, currentToken, decodedToken.result.type || route.params.type);
-		handleGetNotifications(decodedToken.result.id, 0, currentToken)
-
-	};
-
-	const getTotalActiveNotifications = async (currentToken) => {
-		const config = {
-			headers: { Authorization: `Bearer ${currentToken}` }
-		};
-
-		const data = {
-			user_id: userId
-		}
-
-		await axios.post(`${PRODUCTION_SERVER}/notifications/getTotalActiveUserNotifications`, data, config)
-			.then((response) => {
-
-				const success = response.data.success;
-
-				if (success === 0) {
-					return alert('An error occured while getting on-going cases')
-				}
-
-				if (success === 1) {
-					return setNotificationCounts(response.data.results.total_notifications)
-				}
-
-				alert('Something went wrong... Please try again')
-
-			});
-	}
-
-	const getOnGoingCommunicableDiseaseCase = async (currentToken) => {
-		const config = {
-			headers: { Authorization: `Bearer ${currentToken}` }
-		};
-
-		const data = {
-			case_status: "On-going"
-		}
-
-		await axios.post(`${PRODUCTION_SERVER}/communicable_disease/getCommunicableDiseaseByStatus`, data, config)
-			.then((response) => {
-
-				const success = response.data.success;
-
-				if (success === 0) {
-					return alert('An error occured while getting on-going cases')
-				}
-
-				if (success === 1) {
-					return setReportedCommunicableDiseaseOnGoing(response.data.data)
-				}
-
-				alert('Something went wrong... Please try again')
-
-			});
-	}
-
-	const getResolvedCommunicableDiseaseCase = async (currentToken) => {
-
-		const config = {
-			headers: { Authorization: `Bearer ${currentToken}` }
-		};
-
-		const data = {
-			case_status: "Resolved"
-		}
-
-		await axios.post(`${PRODUCTION_SERVER}/communicable_disease/getCommunicableDiseaseByStatus`, data, config)
-			.then((response) => {
-
-				const success = response.data.success;
-
-				if (success === 0) {
-					return alert('An error occured while getting resolved cases')
-				}
-
-				if (success === 1) {
-					return setReportedCommunicableDiseaseResolved(response.data.data)
-				}
-
-				alert('Something went wrong... Please try again')
-
-			});
-	}
-
-
-	const getUserDetails = async (userId, currentToken, userType) => {
-
-		const config = {
-			headers: { Authorization: `Bearer ${currentToken}` }
-		};
-
-		const data = {
-			id: userId,
-		};
-		await axios.post(`${PRODUCTION_SERVER}/user/${userType}`, data, config)
-			.then((response) => {
-				const success = response.data.success;
-
-				if (success === 0 && message === "No data found for this user") {
-					return navigation.navigate("SignUpUserType");
-				}
-
-				if (success === 0 && message === "Invalid token") {
-					alert("Please re-login to continue")
-					return navigation.navigate("Login");
-				}
-
-				setFullname(response.data.data.firstname + " " + response.data.data.lastname)
-				setUserId(userId)
-				setType(userType)
-				setProfileUrl(response.data.data.profile_url)
-			});
-
-	};
-
-	useEffect(() => {
-		GetCovidUpdate();
-	}, []);
-
-	const GetCovidUpdate = () => {
-		axios
-			.get("https://disease.sh/v3/covid-19/countries/PH?strict=true")
-			.then((response) => {
-				setPopulation(response.data.population);
-				setActiveCases(response.data.active);
-				setCases(response.data.cases);
-				setRecovered(response.data.recovered);
-				setDeaths(response.data.deaths);
-			});
-	};
-
-	const handleGetNotifications = async (user_id, offset, token) => {
-		const config = {
-			headers: { Authorization: `Bearer ${token}` },
-			params: { "start-at": offset }
-		}
-
-		await axios.get(`${PRODUCTION_SERVER}/notifications/user-notifications/${user_id}`, config)
-			.then((response) => {
-				if (response.data.success === 0) {
-					return alert(DEFAULT_ERROR_MESSAGE)
-				}
-
-				let returnArray = response.data.results
-				return setNotificationLists(returnArray)
-			}).catch(() => {
-				alert(DEFAULT_ERROR_MESSAGE)
-			})
-	}
-
 
 	// Return
 	return (
 		<SafeAreaView>
 			<View style={styles.container}>
 				<StatusBar animated={true} backgroundColor="#E1F5E4" barStyle='dark-content' />
+				<BottomDrawer
+					open={openBottomDrawer} 
+					toggleBottomNavigationView={toggleBottomNavigationView}
+					props={userProfile}
+					navigation={navigation}
+				/>
 				{/* Notification View */}
 				<View style={styles.topContainer}>
 					<View style={styles.menuLogo}>
@@ -289,7 +110,7 @@ const Dashboard = ({ navigation, route }) => {
 								resizeMode="contain"
 								style={{ width: "70%", height: "70%" }}
 							>
-								{notificationCounts === 0 ? null : (
+								{/* {notificationCounts === 0 ? null : (
 									<Text
 										style={{
 											backgroundColor: "red",
@@ -306,21 +127,16 @@ const Dashboard = ({ navigation, route }) => {
 									>
 										{notificationCounts}
 									</Text>
-								)}
+								)} */}
 							</ImageBackground>
 						</TouchableWithoutFeedback>
 					</View>
-					{/*bottom navigation for user settings  */}
-
-					<Menu visible={visible} toggleBottomNavigationView={toggleBottomNavigationView} props={{ userId, fullname, type, profileUrl }} navigation={navigation} />
-
-
 					{/*end of bottom navigation for user settings  */}
 
 					{/* start of botton sheet for notification */}
 
 
-					<Notifications notifVisible={notifVisible} toggleNotifNavigationView={toggleNotifNavigationView} props={{ userId, token, notificationLists }} navigation={navigation} />
+					{/* <Notifications notifVisible={notifVisible} toggleNotifNavigationView={toggleNotifNavigationView} props={{ userId, token, notificationLists }} navigation={navigation} /> */}
 
 				</View>
 				{/*End  Notification View */}
@@ -342,7 +158,7 @@ const Dashboard = ({ navigation, route }) => {
 								<TouchableOpacity
 									style={styles.btnScnQr}
 									onPress={() => {
-										navigation.navigate("QrScanner", { type: type, id: userId, token: token });
+										navigation.navigate("QrScanner", { type, id, token: token });
 									}}
 								>
 									<ImageBackground
@@ -354,7 +170,7 @@ const Dashboard = ({ navigation, route }) => {
 								<TouchableOpacity
 									style={styles.btnRepCovidTest}
 									onPress={() => {
-										navigation.navigate("ReportCovidCase", { id: userId, type: type });
+										navigation.navigate("ReportCovidCase", { id, type });
 									}}
 								>
 									<ImageBackground
@@ -367,7 +183,7 @@ const Dashboard = ({ navigation, route }) => {
 								<TouchableOpacity
 									style={styles.btnRepEmergency}
 									onPress={() => {
-										navigation.navigate("ReportEmergency", { id: userId, type: type });
+										navigation.navigate("ReportEmergency", { id, type });
 									}}
 								>
 									<ImageBackground
@@ -397,7 +213,7 @@ const Dashboard = ({ navigation, route }) => {
 								style={styles.confirmCasesCard}
 							>
 								<Text style={{ fontSize: 10 }}>Confirmed</Text>
-								<Text
+								{/* <Text
 									style={{ fontSize: 22, fontWeight: "bold", color: "#28CD41" }}
 								>
 									{
@@ -406,7 +222,7 @@ const Dashboard = ({ navigation, route }) => {
 											:
 											0
 									}
-								</Text>
+								</Text> */}
 							</ImageBackground>
 
 							<ImageBackground
@@ -415,7 +231,7 @@ const Dashboard = ({ navigation, route }) => {
 								style={styles.confirmCasesCard}
 							>
 								<Text style={{ fontSize: 10 }}>Recovered</Text>
-								<Text
+								{/* <Text
 									style={{ fontSize: 22, fontWeight: "bold", color: "#28CD41" }}
 								>
 									{
@@ -424,7 +240,7 @@ const Dashboard = ({ navigation, route }) => {
 											:
 											0
 									}
-								</Text>
+								</Text> */}
 							</ImageBackground>
 						</View>
 

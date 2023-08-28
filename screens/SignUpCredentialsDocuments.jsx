@@ -72,7 +72,7 @@ const SignUpCredentialsDocuments = ({ navigation, route }) => {
 			quality: 1,
 		});
 
-		if (!result.cancelled) {
+		if (!result.canceled) {
 			setProfilePhoto(result);
 		}
 
@@ -89,7 +89,7 @@ const SignUpCredentialsDocuments = ({ navigation, route }) => {
 			quality: 1,
 		});
 
-		if (!result.cancelled) {
+		if (!result.canceled) {
 			setFrontIdPhoto(result);
 		}
 
@@ -107,7 +107,7 @@ const SignUpCredentialsDocuments = ({ navigation, route }) => {
 			quality: 1,
 		});
 
-		if (!result.cancelled) {
+		if (!result.canceled) {
 			setBackIdPhoto(result);
 		}
 

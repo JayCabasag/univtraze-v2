@@ -1,4 +1,5 @@
 import axios from "axios";
+import { SERVER } from "./configs";
 
 export const genericGetRequest = async (url, token = null) => {
     try {

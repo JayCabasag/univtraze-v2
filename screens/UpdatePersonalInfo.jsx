@@ -121,7 +121,7 @@ const UpdatePersonalInfo = ({ navigation, route }) => {
 			quality: 1,
 		});
 
-		if (!result.cancelled) {
+		if (!result.canceled) {
 			setProfilePhoto(result);
 		}
 

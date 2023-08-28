@@ -65,7 +65,7 @@ const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 			quality: 1,
 		});
 
-		if (!result.cancelled) {
+		if (!result.canceled) {
 			setProofDoc(result);
 		}
 

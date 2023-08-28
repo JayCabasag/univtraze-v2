@@ -16,3 +16,5 @@ export const UserTypes = {
     EMPLOYEE: 'employee',
     VISITOR: 'visitor'
 }
+
+export const DEFAULT_PROFILE_PHOTO = 'https://univtraze.tech/api/v1/user-photo-uploads/icons8-user-24.png'

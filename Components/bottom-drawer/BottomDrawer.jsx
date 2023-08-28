@@ -8,34 +8,36 @@ import {
 	TouchableOpacity,
 } from "react-native";
 import { BottomSheet } from "react-native-btr";
-import React, { useState, useEffect } from "react";
-import QRCode from "react-native-qrcode-svg";
-import base64 from "base-64"
-import * as SecureStore from "expo-secure-store";
+import React, { useState } from "react";
 import { useToast } from "react-native-toast-notifications";
+import { useUser } from '../../contexts/user/UserContext'
+import { DEFAULT_PROFILE_PHOTO } from "../../utils/app_constants";
+import BottomDrawerQrModal from "./BottomDrawerQrModal";
 
+const BottomDrawer = ({ open, toggleBottomNavigationView, props , navigation }) => {
 
-const Menu = ({visible, toggleBottomNavigationView, props:{userId, fullname, type, profileUrl}, navigation, active}) => {
-
-const [modalVisible, setModalVisible] = useState(false);
-const [dataToConvertToQr, setdataToConvertToQr] = useState("Invalid")
+const [openQrModal, setOpenQrModal] = useState(false)
+const [qrModalPayload, setQrModalPayload] = useState({})
+const user = useUser()
+const { id, type } = user
+const fullname = `${props?.['first_name'] ?? ''} ${props?.['last_name'] ?? ''}`
 
 const toast = useToast()
 
-const viewQrCode = (currentUserId, currentUserType) => {
-	var rawData = {id: currentUserId, type: currentUserType, name: fullname}
-	setdataToConvertToQr(base64.encode(JSON.stringify(rawData)))
-	
-	
-	setModalVisible(true)
+const viewQrCode = () => {
+	if (!id) return
+	if (!type) return
+	let rawData = {id, type, name: fullname}
+	setQrModalPayload(rawData)
+	setOpenQrModal(true)
+	return
 }
 
 async function clear(key, value) {
 	await SecureStore.deleteItemAsync(key, value);
 }
 
-const logout = async () => {
-											
+const logout = async () => {							
 	await clear('x-token')
 	toast.show("Logged out successfully...", {
 		type: "normal",
@@ -49,11 +51,15 @@ const logout = async () => {
 
 return (
     <BottomSheet
-		visible={visible}
+		visible={open}
 		onBackButtonPress={toggleBottomNavigationView}
 		onBackdropPress={toggleBottomNavigationView}
 	>
-		{/*Bottom Sheet inner View*/}
+			<BottomDrawerQrModal
+			  openQrModal={openQrModal}
+			  setOpenQrModal={setOpenQrModal}
+			  payload={qrModalPayload}
+			/>
 			<View style={styles.bottomNavigationView}>
 				<View style={{ width: "100%", height: "100%" }}>
 					<View
@@ -62,12 +68,13 @@ return (
 									<View
 										style={{
 											shadowColor: "black",
-											marginStart: 40,
+											display: 'flex',
+											alignItems: 'center',
 											justifyContent: "center",
 										}}
 									>
 										<Image
-											source={{uri : profileUrl}}
+											source={{uri : props?.['profile_photo'] ?? DEFAULT_PROFILE_PHOTO }}
 											resizeMode="cover"
 											style={{
 												width: 50,
@@ -83,7 +90,6 @@ return (
 										<Text numberOfLines={1} style={{ fontSize: 22, fontWeight: "bold" }}>
 											{fullname}
 										</Text>
-
 										<TouchableOpacity
 											style={{
 												width: 120,
@@ -96,7 +102,7 @@ return (
 												alignItems: "center",
 												marginTop: 5,
 											}}
-											onPress={() => viewQrCode(userId, type)}
+											onPress={viewQrCode}
 										>
 											<Text style={{ color: "#28CD41", fontWeight: "bold" }}>
 												{" "}
@@ -104,89 +110,6 @@ return (
 											</Text>
 										</TouchableOpacity>
 									</View>
-									<Modal
-										animationType="fade"
-										transparent={true}
-										visible={modalVisible}
-										onRequestClose={() => {
-											setModalVisible(!modalVisible);
-										}}
-									>
-										{/* POP-UP MODAL VIEW */}
-										<Pressable
-											style={styles.centeredViews}
-											onPress={() => setModalVisible(!modalVisible)}
-										>
-											<View style={styles.modalView}>
-												<Text
-													style={{
-														fontSize: 28,
-														color: "#28CD41",
-														fontWeight: "bold",
-													}}
-												>
-													UnivTraze
-												</Text>
-
-												{/* QR Container */}
-												<View
-													style={{
-														width: 210,
-														height: 210,
-														borderWidth: 2,
-														borderColor: "#28CD41",
-														borderRadius: 20,
-														marginTop: 5,
-														justifyContent: 'center',
-    													alignItems: 'center'
-													}}
-												>
-													
-													<QRCode value={dataToConvertToQr} size={160}/>
-													
-
-												</View>
-
-												{/* QR Code */}
-												<Text style={{ color: "rgba(54, 77, 57, 0.6)", textTransform: 'uppercase'}}>
-													univtraze-{userId}
-												</Text>
-												{/* User Name */}
-
-												<Text style={{ fontSize: 28, marginTop: 10 }}>
-													{fullname}
-												</Text>
-
-												{/* User Type */}
-
-												<Text
-													style={{
-														fontSize: 16,
-														color: "rgba(54, 77, 57, 0.6)",
-														textTransform: 'uppercase'
-													}}
-												>
-													{type}
-												</Text>
-
-												{/* Download QR */}
-												{/* <Pressable
-													style={[styles.buttons]}
-													// onPress={() => setModalVisible(!modalVisible)}
-												>
-													<Text
-														style={{
-															color: "white",
-															fontSize: 16,
-															fontWeight: "700",
-														}}
-													>
-														Download QR
-													</Text>
-												</Pressable> */}
-											</View>
-										</Pressable>
-									</Modal>
 								</View>
 
 								<View
@@ -248,7 +171,7 @@ return (
 									<TouchableOpacity
 										onPress={() => {
 											toggleBottomNavigationView();
-											navigation.navigate('TemperatureHistory', {id: userId, type: type})
+											navigation.navigate('TemperatureHistory', {id, type })
 										}}
 										style={{
 											width: "100%",
@@ -274,7 +197,7 @@ return (
 									<TouchableOpacity
 										onPress={() => {
 											toggleBottomNavigationView();
-											navigation.navigate('AccountSettings', {id: userId, type: type})
+											navigation.navigate('AccountSettings', {id, type})
 										}}
 										style={{
 											width: "100%",
@@ -300,7 +223,7 @@ return (
 									<TouchableOpacity
 										onPress={() => {
 											toggleBottomNavigationView();
-											navigation.navigate('RoomVisited', {id: userId, type: type})
+											navigation.navigate('RoomVisited', {id, type })
 										}}
 										style={{
 											width: "100%",
@@ -358,7 +281,7 @@ return (
   )
 }
 
-export default Menu;
+export default BottomDrawer;
 
 const styles = StyleSheet.create({
 	container: {
@@ -376,8 +299,8 @@ const styles = StyleSheet.create({
 	},
 	profileContainer: {
 		width: "100%",
-		height: "25%",
-		 justifyContent: "center",
+		height: 'auto',
+		justifyContent: "center",
 		padding: 15,
 		flexDirection: "row",
 		marginTop: 10,
