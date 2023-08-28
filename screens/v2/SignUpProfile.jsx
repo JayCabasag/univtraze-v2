@@ -17,26 +17,29 @@ import { AntDesign } from '@expo/vector-icons';
 import { useFormik } from "formik";
 import { ProfileValidationSchema } from "./schemas/SignUpProfileSchema";
 import { format } from "date-fns";
+import { useUser } from "../../contexts/user/UserContext";
+import { formatPhoneNumber } from "../../utils/formatters";
 
-export const SignUpUserProfile = ({ navigation, route }) => {
+export const SignUpUserProfile = ({ navigation }) => {
 
+	const user = useUser()
 	const [showDatePicker, setShowDatePicker] = useState(false)
 	const today = new Date();
 
 	const formik = useFormik({
 		initialValues: {
-		  type: route.params.type,
 		  firstName: '',
 		  middleName: '',
 		  lastName: '',
 		  suffix: '',
 		  gender: 'Rather not say',
+		  phoneNumber: '',
           address: '',
 		  dateOfBirth: today
 		},
 		validationSchema: ProfileValidationSchema,
 		onSubmit: values => {
-		  
+		  console.log(values)
 		},
 	});
 
@@ -54,6 +57,7 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 	const hasGenderError = !!formik.errors.gender && formik.touched.gender
 	const hasAddressError = !!formik.errors.address && formik.touched.address
 	const hasDateOfBirthError = !!formik.errors.dateOfBirth && formik.touched.dateOfBirth
+	const hasPhoneNumberError = !!formik.errors.phoneNumber && formik.touched.phoneNumber
 
 	return (
 		<SafeAreaView>
@@ -129,7 +133,7 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 
 							<View style={{ width: "50%", borderRadius: 15 }}>
 								<Text style={styles.label}>Gender </Text>
-								<View style={formik.errors.gender ? styles.genderPickerError : styles.genderPicker}>
+								<View style={hasGenderError ? styles.genderPickerError : styles.genderPicker}>
 									<Picker
 										style={{
 											width: "100%",
@@ -170,6 +174,23 @@ export const SignUpUserProfile = ({ navigation, route }) => {
 							style={hasLastnameError ? styles.errorInput : styles.input}
 						/>
 						{hasAddressError && <Text style={styles.errorLabel}>*{formik.errors.address}</Text>}
+					</View>
+
+					<View
+						style={{ width: "100%", alignItems: "center", borderRadius: 15 }}
+					>
+						<Text style={styles.label}>Phone number</Text>
+						<TextInput
+							placeholder="Phone number"
+							value={formik.values.phoneNumber}
+							onChangeText={(text) => {
+								const formattedPhoneNumber = formatPhoneNumber(text)
+								handleInputTextChange(formattedPhoneNumber, 'phoneNumber')
+							}}
+							onBlur={() => handleInputTextBlur('phoneNumber')}
+							style={hasPhoneNumberError ? styles.errorInput : styles.input}
+						/>
+						{hasPhoneNumberError && <Text style={styles.errorLabel}>*{formik.errors.phoneNumber}</Text>}
 					</View>
 
 					<View

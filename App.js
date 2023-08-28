@@ -28,7 +28,7 @@ import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
 import { default as theme } from './utils/theme/theme.json';
 import { UserProvider } from './contexts/user/UserContext';
-import SignUpUserProfile from './screens/v2/SignUpProfiles';
+import SignUpUserProfile from './screens/v2/SignUpProfile';
 
 export default function App() {
 
@@ -46,9 +46,7 @@ export default function App() {
               <Stack.Screen options={{ headerShown: false }} name="ReportEmergency" component={ReportEmergency} />
               <Stack.Screen options={{ headerShown: false }} name="ReportCovidCase" component={ReportCovidCase} />
               <Stack.Screen options={{ headerShown: false }} name="QrScanner" component={QrScanner} />
-              <Stack.Screen options={{ headerShown: false }} name="SignUpUserCredentialsStudent" component={SignUpUserProfile} />
-              <Stack.Screen options={{ headerShown: false }} name="SignUpUserCredentialsEmployee" component={SignUpUserCredentialsEmployee} />
-              <Stack.Screen options={{ headerShown: false }} name="SignUpUserCredentialsVisitor" component={SignUpUserCredentialsVisitor} />
+              <Stack.Screen options={{ headerShown: false }} name="SignUpProfile" component={SignUpUserProfile} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpUserType" component={SignUpUserType} />
               <Stack.Screen options={{ headerShown: false }} name="SignUp" component={SignUp} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpVaccination" component={SignUpVaccination} />

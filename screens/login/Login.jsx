@@ -77,17 +77,8 @@ const Login = ({ navigation }) => {
 	const [loadingMessage, setLoadingMessage] = useState("Logging in please wait...")
 
 	const redirect = (verified) => {
-		if (!verified) {
-			const typeToRoute = {
-			  [UserTypes.STUDENT]: "SignUpUserCredentialsStudent",
-			  [UserTypes.EMPLOYEE]: "SignUpUserCredentialsEmployee",
-			  [UserTypes.VISITOR]: "SignUpUserCredentialsVisitor",
-			};
-			  
-			const route = typeToRoute[formik.values.type];
-			if (route) {
-			  return navigation.navigate(route, { type: formik.values.type });
-			}
+		if (!verified) {			  
+			return navigation.navigate('SignUpProfile');
 		}
 		navigation.navigate("Dashboard");
 	}
