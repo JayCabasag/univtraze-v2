@@ -43,7 +43,7 @@ export default function App() {
               <Stack.Screen options={{ headerShown: false }} name="ReportEmergency" component={ReportEmergency} />
               <Stack.Screen options={{ headerShown: false }} name="ReportCovidCase" component={ReportCovidCase} />
               <Stack.Screen options={{ headerShown: false }} name="QrScanner" component={QrScanner} />
-              <Stack.Screen options={{ headerShown: false }} name="SignUpProfile" component={UserProfile} />
+              <Stack.Screen options={{ headerShown: false }} name="UserProfile" component={UserProfile} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpUserType" component={SignUpUserType} />
               <Stack.Screen options={{ headerShown: false }} name="SignUp" component={SignUp} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpVaccination" component={SignUpVaccination} />

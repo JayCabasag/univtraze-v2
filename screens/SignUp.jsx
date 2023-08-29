@@ -123,18 +123,9 @@ const SignUp = ({ navigation, route }) => {
 
 	const redirect = (verified) => {
 		if (!verified) {
-			const typeToRoute = {
-			  [UserTypes.STUDENT]: "SignUpUserCredentialsStudent",
-			  [UserTypes.EMPLOYEE]: "SignUpUserCredentialsEmployee",
-			  [UserTypes.VISITOR]: "SignUpUserCredentialsVisitor",
-			};
-			  
-			const route = typeToRoute[selectedType];
-			if (route) {
-			  return navigation.navigate(route, { type: selectedType });
-			}
+			return navigation.navigate('UserProfile', { type: selectedType });
 		}
-		navigation.navigate("Dashboard");
+		return navigation.navigate("Dashboard");
 	}
 
 	return (

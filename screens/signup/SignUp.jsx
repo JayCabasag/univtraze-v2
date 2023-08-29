@@ -82,18 +82,9 @@ const SignUp = ({ navigation, route }) => {
 	const redirect = (verified) => {
 		setShowSuccessModal(false)
 		if (!verified) {
-			const typeToRoute = {
-			  [UserTypes.STUDENT]: "SignUpUserCredentialsStudent",
-			  [UserTypes.EMPLOYEE]: "SignUpUserCredentialsEmployee",
-			  [UserTypes.VISITOR]: "SignUpUserCredentialsVisitor",
-			};
-
-			const route = typeToRoute[formik.values.type];
-			if (route) {
-			  return navigation.navigate(route, { type: formik.values.type });
-			}
+			return navigation.navigate('UserProfile', { type: formik.values.type });
 		}
-		navigation.navigate("Dashboard");
+		return navigation.navigate("Dashboard");
 	}
 
 	const handleInputTextChange = (type, name) => {
