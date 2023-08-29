@@ -233,10 +233,6 @@ const styles = StyleSheet.create({
 	buttonContainer: {
 		backgroundColor: "transparent",
 	},
-	button: {
-		borderRadius: 20,
-		elevation: 2,
-	},
 	buttonOpen: {
 		backgroundColor: '#F194FF',
 	},
@@ -323,6 +319,14 @@ const styles = StyleSheet.create({
 		width: '100%',
 		marginTop: 10,
 		paddingVertical: 18,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 1,
+		},
+		shadowOpacity: 0.22,
+		shadowRadius: 2.22,
+		elevation: 3,
 	},
 	buttonText: {
 		color: "#FFF",

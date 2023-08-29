@@ -143,7 +143,15 @@ const styles = StyleSheet.create({
         alignItems:'center',
         alignSelf:'center',
         marginTop: 15,
-        paddingVertical: 18
+        paddingVertical: 18,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 1,
+		},
+		shadowOpacity: 0.22,
+		shadowRadius: 2.22,
+		elevation: 3,
     },
     buttonText: {
         fontSize: 16,

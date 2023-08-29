@@ -13,17 +13,20 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { PieChart } from "react-native-chart-kit";
 import moment from "moment";
-import Menu from "../Components/bottom-drawer/BottomDrawer";
-import Notifications from "../Components/notifications/Notifications";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { genericGetRequest } from '../services/genericGetRequest'
-import { useUser } from '../contexts/user/UserContext'
-import BottomDrawer from "../Components/bottom-drawer/BottomDrawer";
+import { genericGetRequest } from '../../services/genericGetRequest'
+import { useUser } from '../../contexts/user/UserContext'
+import BottomDrawer from "../../Components/bottom-drawer/BottomDrawer";
 
-const Dashboard = ({ navigation, route }) => {
+const Dashboard = ({ navigation }) => {
 	const { id, type, token } = useUser()
 	const [userProfile, setUserProfile] = useState(null)
 	const fullname = `${userProfile?.['first_name'] ?? ''} ${userProfile?.['last_name'] ?? ''}`
+	const [openBottomDrawer, setOpenBottomDrawer] = useState(false)
+	const [notifVisible, setNotifVisible] = useState(false);
+	const [recovered, setRecovered] = useState(0)
+	const [activeCases, setActiveCases] = useState(0)
+	const [deaths, setDeaths] = useState(0)
 	const [population, setPopulation] = useState(0)
 	const [cases, setCases] = useState(0)
 
@@ -44,43 +47,30 @@ const Dashboard = ({ navigation, route }) => {
 	  return () => {}
 	}, [id, token])
 
-	const [openBottomDrawer, setOpenBottomDrawer] = useState(false)
-
-	const [visible, setVisible] = useState(false);
-	const [notifVisible, setNotifVisible] = useState(false);
-	const [recovered, setRecovered] = useState(0)
-	const [activeCases, setActiveCases] = useState(0)
-	const [deaths, setDeaths] = useState(0)
-
-	// useEffect(() => {
-	// 	const GetCovidUpdate = () => {
-	// 		axios
-	// 			.get("https://disease.sh/v3/covid-19/countries/PH?strict=true")
-	// 			.then((response) => {
-	// 				setPopulation(response.data.population);
-	// 				setActiveCases(response.data.active);
-	// 				setCases(response.data.cases);
-	// 				setRecovered(response.data.recovered);
-	// 				setDeaths(response.data.deaths);
-	// 			});
-	// 	};
-	// 	GetCovidUpdate();
-	// }, []);
+	useEffect(() => {
+		const GetCovidUpdate = () => {
+			axios
+				.get("https://disease.sh/v3/covid-19/countries/PH?strict=true")
+				.then((response) => {
+					setPopulation(response.data.population);
+					setActiveCases(response.data.active);
+					setCases(response.data.cases);
+					setRecovered(response.data.recovered);
+					setDeaths(response.data.deaths);
+				});
+		};
+		GetCovidUpdate();
+	}, []);
 
 	const toggleBottomNavigationView = () => {
-		//Toggling the visibility state of the bottom sheet
 		setOpenBottomDrawer(!openBottomDrawer)
 	};
 
-	console.log(visible)
-
 	const toggleNotifNavigationView = () => {
-		//Toggling the visibility state of the bottom sheet
 		getTotalActiveNotifications(token)
 		setNotifVisible(!notifVisible);
 	};
 
-	// Return
 	return (
 		<SafeAreaView>
 			<View style={styles.container}>
@@ -91,12 +81,11 @@ const Dashboard = ({ navigation, route }) => {
 					props={userProfile}
 					navigation={navigation}
 				/>
-				{/* Notification View */}
 				<View style={styles.topContainer}>
 					<View style={styles.menuLogo}>
 						<TouchableWithoutFeedback onPress={toggleBottomNavigationView}>
 							<ImageBackground
-								source={require('../assets/notifmenu_icon.png')}
+								source={require('../../assets/notifmenu_icon.png')}
 								resizeMode="contain"
 								style={styles.image}
 							></ImageBackground>
@@ -106,7 +95,7 @@ const Dashboard = ({ navigation, route }) => {
 					<View style={styles.notifLogo}>
 						<TouchableWithoutFeedback onPress={toggleNotifNavigationView}>
 							<ImageBackground
-								source={require('../assets/notification_icon.png')}
+								source={require('../../assets/notification_icon.png')}
 								resizeMode="contain"
 								style={{ width: "70%", height: "70%" }}
 							>
@@ -162,7 +151,7 @@ const Dashboard = ({ navigation, route }) => {
 									}}
 								>
 									<ImageBackground
-										source={require('../assets/scan_qr_icon.png')}
+										source={require('../../assets/scan_qr_icon.png')}
 										resizeMode="contain"
 										style={styles.btnimage}
 									></ImageBackground>
@@ -174,7 +163,7 @@ const Dashboard = ({ navigation, route }) => {
 									}}
 								>
 									<ImageBackground
-										source={require("../assets/report_communicable_disease_icon.png")}
+										source={require("../../assets/report_communicable_disease_icon.png")}
 										resizeMode="contain"
 										style={styles.btnimage}
 									></ImageBackground>
@@ -187,7 +176,7 @@ const Dashboard = ({ navigation, route }) => {
 									}}
 								>
 									<ImageBackground
-										source={require("../assets/report_emergency_icon.png")}
+										source={require("../../assets/report_emergency_icon.png")}
 										resizeMode="contain"
 										style={styles.btnimage}
 									></ImageBackground>
@@ -208,7 +197,7 @@ const Dashboard = ({ navigation, route }) => {
 						</View>
 						<View style={styles.casesContainer}>
 							<ImageBackground
-								source={require('../assets/confirmed_case_icon.png')}
+								source={require('../../assets/confirmed_case_icon.png')}
 								resizeMode="stretch"
 								style={styles.confirmCasesCard}
 							>
@@ -226,7 +215,7 @@ const Dashboard = ({ navigation, route }) => {
 							</ImageBackground>
 
 							<ImageBackground
-								source={require('../assets/confirmed_case_icon.png')}
+								source={require('../../assets/confirmed_case_icon.png')}
 								resizeMode="stretch"
 								style={styles.confirmCasesCard}
 							>
@@ -339,7 +328,7 @@ const Dashboard = ({ navigation, route }) => {
 									accessor="population"
 									backgroundColor="transparent"
 									paddingLeft="2"
-									absolute //for the absolute number remove if you want percentage
+									absolute
 								/>
 							</View>
 						</View>

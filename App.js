@@ -5,14 +5,10 @@ import Login from './screens/login/Login';
 import SignUp from './screens/signup/SignUp';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Dashboard from './screens/Dashboard';
 import SignUpUserType from './screens/SignUpUserType';
-import SignUpUserCredentialsStudent from './screens/SignUpUserCredentialsStudent';
 import QrScanner from './screens/QrScanner';
 import ReportCovidCase from './screens/ReportCovidCase'
 import ReportEmergency from './screens/ReportEmergency'
-import SignUpUserCredentialsEmployee from './screens/SignUpUserCredentialsEmployee';
-import SignUpUserCredentialsVisitor from './screens/SignUpUserCredentialsVisitor';
 import DailyAsessment from './screens/DailyAsessment';
 import RoomVisited from './screens/RoomVisited';
 import TemperatureHistory from './screens/TemperatureHistory';
@@ -28,7 +24,8 @@ import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
 import { default as theme } from './utils/theme/theme.json';
 import { UserProvider } from './contexts/user/UserContext';
-import SignUpUserProfile from './screens/v2/SignUpProfile';
+import { UserProfile } from './screens/user-profile/UserProfile';
+import Dashboard from './screens/dashboard/Dashboard';
 
 export default function App() {
 
@@ -46,7 +43,7 @@ export default function App() {
               <Stack.Screen options={{ headerShown: false }} name="ReportEmergency" component={ReportEmergency} />
               <Stack.Screen options={{ headerShown: false }} name="ReportCovidCase" component={ReportCovidCase} />
               <Stack.Screen options={{ headerShown: false }} name="QrScanner" component={QrScanner} />
-              <Stack.Screen options={{ headerShown: false }} name="SignUpProfile" component={SignUpUserProfile} />
+              <Stack.Screen options={{ headerShown: false }} name="SignUpProfile" component={UserProfile} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpUserType" component={SignUpUserType} />
               <Stack.Screen options={{ headerShown: false }} name="SignUp" component={SignUp} />
               <Stack.Screen options={{ headerShown: false }} name="SignUpVaccination" component={SignUpVaccination} />

@@ -15,14 +15,12 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from '@expo/vector-icons';
 import { useFormik } from "formik";
-import { ProfileValidationSchema } from "./schemas/SignUpProfileSchema";
+import { ProfileValidationSchema } from "./schemas/UserProfileSchema";
 import { format } from "date-fns";
-import { useUser } from "../../contexts/user/UserContext";
 import { formatPhoneNumber } from "../../utils/formatters";
 
-export const SignUpUserProfile = ({ navigation }) => {
+export const UserProfile = ({ navigation }) => {
 
-	const user = useUser()
 	const [showDatePicker, setShowDatePicker] = useState(false)
 	const today = new Date();
 
@@ -259,7 +257,7 @@ export const SignUpUserProfile = ({ navigation }) => {
 };
 
 
-export default SignUpUserProfile;
+export default UserProfile;
 
 const styles = StyleSheet.create({
 	header: {
