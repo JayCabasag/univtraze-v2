@@ -7,19 +7,20 @@ import {
   TouchableOpacity,
   Text,
   StatusBar,
+  Alert,
 } from 'react-native';
 import React, { useState } from 'react';
+import { useFormik } from 'formik';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DEFAULT_ERROR_MESSAGE, UserTypes } from '../../utils/app_constants';
-import Loading from '../../Components/loading/Loading';
-import TypeSelect from '../../Components/type/TypeSelect';
+import { UserTypes } from '../../utils/app_constants';
+import Loading from '../../components/loading/Loading';
+import TypeSelect from '../../components/type/TypeSelect';
 import { genericPostRequest } from '../../services/genericPostRequest';
 import { useUserDispatch } from '../../contexts/user/UserContext';
-import { useFormik } from 'formik';
 import { LoginSchema } from './schemas/LoginSchema';
-import { Alert } from 'react-native';
+import loginImage from '../../assets/login_image.png';
 
-const Login = ({ navigation }) => {
+function Login({ navigation }) {
   const userDispatch = useUserDispatch();
 
   const formik = useFormik({
@@ -38,15 +39,14 @@ const Login = ({ navigation }) => {
       setShowLoadingModal(true);
       await genericPostRequest('/auth/signin', data)
         .then((response) => {
-          const data = response;
-          const user = data['user'];
+          const { user } = response;
           userDispatch({
             type: 'update',
             payload: {
               id: user.sub,
               type: user.type,
               email: user.email,
-              token: data['access_token'],
+              token: data.access_token,
               verified: user.verified,
               status: 'authenticated',
             },
@@ -72,13 +72,13 @@ const Login = ({ navigation }) => {
   });
 
   const [showLoadingModal, setShowLoadingModal] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('Logging in please wait...');
+  const loadingMessage = 'Logging in please wait...';
 
   const redirect = (verified) => {
     if (!verified) {
       return navigation.navigate('UserProfile');
     }
-    navigation.navigate('Dashboard');
+    return navigation.navigate('Dashboard');
   };
 
   const handleInputTextChange = (type, name) => {
@@ -99,10 +99,10 @@ const Login = ({ navigation }) => {
         onClose={() => setShowLoadingModal(!showLoadingModal)}
         message={loadingMessage}
       />
-      <StatusBar animated={true} backgroundColor="#E1F5E4" barStyle="dark-content" />
+      <StatusBar animated backgroundColor="#E1F5E4" barStyle="dark-content" />
       <KeyboardAvoidingView style={styles.container} behavior="height">
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={require('../../assets/login_image.png')} />
+          <Image style={styles.image} source={loginImage} />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.loginText}>Log in</Text>
@@ -151,7 +151,7 @@ const Login = ({ navigation }) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
+}
 
 export default Login;
 

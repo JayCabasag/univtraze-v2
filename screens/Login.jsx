@@ -11,13 +11,13 @@ import {
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DEFAULT_ERROR_MESSAGE, UserTypes } from '../utils/app_constants';
-import Loading from '../Components/loading/Loading';
-import TypeSelect from '../Components/type/TypeSelect';
+import Loading from '../components/loading/Loading';
+import TypeSelect from '../components/type/TypeSelect';
 import { isEmail } from '../utils/regex';
 import { genericPostRequest } from '../services/genericPostRequest';
 import { useUserDispatch } from '../contexts/user/UserContext';
 
-const Login = ({ navigation }) => {
+function Login({ navigation }) {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [emailInput, setEmailInput] = useState('');
@@ -25,7 +25,7 @@ const Login = ({ navigation }) => {
   const [selectedType, setSelectedType] = useState(UserTypes.STUDENT);
   const userDispatch = useUserDispatch();
 
-  //Variables for loading
+  // Variables for loading
 
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Please wait...');
@@ -75,14 +75,14 @@ const Login = ({ navigation }) => {
     await genericPostRequest('/auth/signin', data)
       .then((response) => {
         const data = response;
-        const user = data['user'];
+        const { user } = data;
         userDispatch({
           type: 'update',
           payload: {
             id: user.sub,
             type: user.type,
             email: user.email,
-            token: data['access_token'],
+            token: data.access_token,
             verified: user.verified,
             status: 'authenticated',
           },
@@ -130,7 +130,7 @@ const Login = ({ navigation }) => {
         onClose={() => setShowLoadingModal(!showLoadingModal)}
         message={loadingMessage}
       />
-      <StatusBar animated={true} backgroundColor="#E1F5E4" barStyle="dark-content" />
+      <StatusBar animated backgroundColor="#E1F5E4" barStyle="dark-content" />
       <KeyboardAvoidingView style={styles.container} behavior="height">
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={require('../assets/login_image.png')} />
@@ -177,7 +177,7 @@ const Login = ({ navigation }) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
+}
 
 export default Login;
 

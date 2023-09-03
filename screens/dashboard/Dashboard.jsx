@@ -16,12 +16,18 @@ import moment from 'moment';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { genericGetRequest } from '../../services/genericGetRequest';
 import { useUser } from '../../contexts/user/UserContext';
-import BottomDrawer from '../../Components/bottom-drawer/BottomDrawer';
+import BottomDrawer from '../../components/bottom-drawer/BottomDrawer';
+import notificationMenuIcon from '../../assets/notifmenu_icon.png';
+import notificationIcon from '../../assets/notification_icon.png';
+import qrIcon from '../../assets/scan_qr_icon.png';
+import reportCommunicableDiseaseIcon from '../../assets/report_communicable_disease_icon.png';
+import reportEmergencyIcon from '../../assets/report_emergency_icon.png';
+import confirmedCaseIcon from '../../assets/confirmed_case_icon.png';
 
-const Dashboard = ({ navigation }) => {
+export default function Dashboard({ navigation }) {
   const { id, type, token } = useUser();
   const [userProfile, setUserProfile] = useState(null);
-  const fullname = `${userProfile?.['first_name'] ?? ''} ${userProfile?.['last_name'] ?? ''}`;
+  const fullname = `${userProfile?.first_name ?? ''} ${userProfile?.last_name ?? ''}`;
   const [openBottomDrawer, setOpenBottomDrawer] = useState(false);
   const [notifVisible, setNotifVisible] = useState(false);
   const [recovered, setRecovered] = useState(0);
@@ -41,7 +47,6 @@ const Dashboard = ({ navigation }) => {
         .catch((error) => {
           console.log(error);
         });
-      return;
     };
     getUserProfile();
     return () => {};
@@ -65,14 +70,13 @@ const Dashboard = ({ navigation }) => {
   };
 
   const toggleNotifNavigationView = () => {
-    getTotalActiveNotifications(token);
     setNotifVisible(!notifVisible);
   };
 
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <StatusBar animated={true} backgroundColor="#E1F5E4" barStyle="dark-content" />
+        <StatusBar animated backgroundColor="#E1F5E4" barStyle="dark-content" />
         <BottomDrawer
           open={openBottomDrawer}
           toggleBottomNavigationView={toggleBottomNavigationView}
@@ -83,17 +87,17 @@ const Dashboard = ({ navigation }) => {
           <View style={styles.menuLogo}>
             <TouchableWithoutFeedback onPress={toggleBottomNavigationView}>
               <ImageBackground
-                source={require('../../assets/notifmenu_icon.png')}
+                source={notificationMenuIcon}
                 resizeMode="contain"
                 style={styles.image}
-              ></ImageBackground>
+              />
             </TouchableWithoutFeedback>
           </View>
 
           <View style={styles.notifLogo}>
             <TouchableWithoutFeedback onPress={toggleNotifNavigationView}>
               <ImageBackground
-                source={require('../../assets/notification_icon.png')}
+                source={notificationIcon}
                 resizeMode="contain"
                 style={{ width: '70%', height: '70%' }}
               >
@@ -118,13 +122,13 @@ const Dashboard = ({ navigation }) => {
               </ImageBackground>
             </TouchableWithoutFeedback>
           </View>
-          {/*end of bottom navigation for user settings  */}
+          {/* end of bottom navigation for user settings  */}
 
           {/* start of botton sheet for notification */}
 
           {/* <Notifications notifVisible={notifVisible} toggleNotifNavigationView={toggleNotifNavigationView} props={{ userId, token, notificationLists }} navigation={navigation} /> */}
         </View>
-        {/*End  Notification View */}
+        {/* End  Notification View */}
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.bodyContainer}>
             <View style={styles.topTextContainer}>
@@ -136,21 +140,17 @@ const Dashboard = ({ navigation }) => {
 
             <View style={styles.scrllBtnsContainer}>
               <ScrollView
-                horizontal={true}
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 style={styles.scrllViewContainer}
               >
                 <TouchableOpacity
                   style={styles.btnScnQr}
                   onPress={() => {
-                    navigation.navigate('QrScanner', { type, id, token: token });
+                    navigation.navigate('QrScanner', { type, id, token });
                   }}
                 >
-                  <ImageBackground
-                    source={require('../../assets/scan_qr_icon.png')}
-                    resizeMode="contain"
-                    style={styles.btnimage}
-                  ></ImageBackground>
+                  <ImageBackground source={qrIcon} resizeMode="contain" style={styles.btnimage} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.btnRepCovidTest}
@@ -159,10 +159,10 @@ const Dashboard = ({ navigation }) => {
                   }}
                 >
                   <ImageBackground
-                    source={require('../../assets/report_communicable_disease_icon.png')}
+                    source={reportCommunicableDiseaseIcon}
                     resizeMode="contain"
                     style={styles.btnimage}
-                  ></ImageBackground>
+                  />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -172,10 +172,10 @@ const Dashboard = ({ navigation }) => {
                   }}
                 >
                   <ImageBackground
-                    source={require('../../assets/report_emergency_icon.png')}
+                    source={reportEmergencyIcon}
                     resizeMode="contain"
                     style={styles.btnimage}
-                  ></ImageBackground>
+                  />
                 </TouchableOpacity>
               </ScrollView>
             </View>
@@ -188,7 +188,7 @@ const Dashboard = ({ navigation }) => {
             </View>
             <View style={styles.casesContainer}>
               <ImageBackground
-                source={require('../../assets/confirmed_case_icon.png')}
+                source={confirmedCaseIcon}
                 resizeMode="stretch"
                 style={styles.confirmCasesCard}
               >
@@ -206,7 +206,7 @@ const Dashboard = ({ navigation }) => {
               </ImageBackground>
 
               <ImageBackground
-                source={require('../../assets/confirmed_case_icon.png')}
+                source={confirmedCaseIcon}
                 resizeMode="stretch"
                 style={styles.confirmCasesCard}
               >
@@ -265,7 +265,7 @@ const Dashboard = ({ navigation }) => {
                   data={[
                     {
                       name: 'Population',
-                      population: population,
+                      population,
                       color: '#28CD41',
                       legendFontColor: '#7F7F7F',
                       legendFontSize: 10,
@@ -328,8 +328,8 @@ const Dashboard = ({ navigation }) => {
       </View>
     </SafeAreaView>
   );
-};
-export default Dashboard;
+}
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#E1F5E4',
@@ -461,44 +461,5 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 'auto',
     alignItems: 'center',
-  },
-  bottomNavigationView: {
-    backgroundColor: '#fff',
-    width: '100%',
-    height: '60%',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-  },
-  centeredViews: {
-    flex: 1,
-    backgroundColor: 'rgba(52, 52, 52, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    width: 350,
-    height: 474,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  buttons: {
-    width: '100%',
-    height: 60,
-    borderRadius: 20,
-    elevation: 2,
-    marginTop: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#28CD41',
   },
 });

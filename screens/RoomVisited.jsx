@@ -14,29 +14,16 @@ import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import moment from 'moment';
 import { DataTable } from 'react-native-paper';
-import { PRODUCTION_SERVER } from '../services/configs';
 import { DEFAULT_ERROR_MESSAGE } from '../utils/app_constants';
+import backIcon from '../assets/back-icon.png';
 
-const RoomVisited = ({
+function RoomVisited({
   navigation,
   route: {
-    params: { id, type },
+    params: { id },
   },
-}) => {
+}) {
   const [roomVisited, setRoomVisited] = useState([]);
-
-  useEffect(() => {
-    getValueFor('x-token');
-  }, []);
-
-  async function getValueFor(key) {
-    let token = await SecureStore.getItemAsync(key);
-    if (token) {
-      handleGetUserVisitedRooms(id, token);
-    } else {
-      alert('No values stored under that jwt-token.');
-    }
-  }
 
   const handleGetUserVisitedRooms = async (uid, currentToken) => {
     const config = {
@@ -46,7 +33,7 @@ const RoomVisited = ({
     await axios
       .get(`${PRODUCTION_SERVER}/rooms/visited-rooms/${uid}`, config)
       .then((response) => {
-        const success = response.data.success;
+        const { success } = response.data;
         if (success === 0) {
           return alert(DEFAULT_ERROR_MESSAGE);
         }
@@ -63,23 +50,14 @@ const RoomVisited = ({
   const viewHistoryData = (room_id, building_name, room_number, date, time) => {
     Alert.alert(
       'Room visited History',
-      'Room ID: ' +
-        room_id +
-        '\n Building name : ' +
-        building_name +
-        '\n Room number: ' +
-        room_number +
-        '\n Date: ' +
-        date +
-        '\n Time: ' +
-        time,
+      `Room ID: ${room_id}\n Building name : ${building_name}\n Room number: ${room_number}\n Date: ${date}\n Time: ${time}`,
       [{ text: 'OK', onPress: () => {} }]
     );
   };
 
   return (
     <SafeAreaView>
-      <StatusBar animated={true} backgroundColor="#E1F5E4" />
+      <StatusBar animated backgroundColor="#E1F5E4" />
       <View style={styles.mainContainer}>
         <View style={styles.topContainer}>
           <View style={styles.backIcon}>
@@ -88,11 +66,7 @@ const RoomVisited = ({
                 navigation.goBack();
               }}
             >
-              <ImageBackground
-                source={require('../assets/back-icon.png')}
-                resizeMode="contain"
-                style={styles.image}
-              ></ImageBackground>
+              <ImageBackground source={backIcon} resizeMode="contain" style={styles.image} />
             </TouchableWithoutFeedback>
           </View>
         </View>
@@ -136,35 +110,33 @@ const RoomVisited = ({
                 <Text style={styles.rowBody}>No rooms visited</Text>
               </View>
             ) : (
-              roomVisited.map((room) => {
-                return (
-                  <DataTable.Row
-                    key={room.id}
-                    onPress={() => {
-                      viewHistoryData(
-                        room.room_id,
-                        room.building_name,
-                        room.room_number,
-                        moment(room.createdAt).format('MM-DD-YY'),
-                        moment(room.createdAt).format('HH:mm A')
-                      );
-                    }}
-                  >
-                    <DataTable.Cell>{room.room_id}</DataTable.Cell>
-                    <DataTable.Cell>{room.building_name}</DataTable.Cell>
-                    <DataTable.Cell>{room.room_number}</DataTable.Cell>
-                    <DataTable.Cell>{moment(room.createdAt).format('MM-DD-YY')}</DataTable.Cell>
-                    <DataTable.Cell>{moment(room.createdAt).format('HH:mm A')}</DataTable.Cell>
-                  </DataTable.Row>
-                );
-              })
+              roomVisited.map((room) => (
+                <DataTable.Row
+                  key={room.id}
+                  onPress={() => {
+                    viewHistoryData(
+                      room.room_id,
+                      room.building_name,
+                      room.room_number,
+                      moment(room.createdAt).format('MM-DD-YY'),
+                      moment(room.createdAt).format('HH:mm A')
+                    );
+                  }}
+                >
+                  <DataTable.Cell>{room.room_id}</DataTable.Cell>
+                  <DataTable.Cell>{room.building_name}</DataTable.Cell>
+                  <DataTable.Cell>{room.room_number}</DataTable.Cell>
+                  <DataTable.Cell>{moment(room.createdAt).format('MM-DD-YY')}</DataTable.Cell>
+                  <DataTable.Cell>{moment(room.createdAt).format('HH:mm A')}</DataTable.Cell>
+                </DataTable.Row>
+              ))
             )}
           </DataTable>
         </ScrollView>
       </View>
     </SafeAreaView>
   );
-};
+}
 
 export default RoomVisited;
 
@@ -242,16 +214,6 @@ const styles = StyleSheet.create({
     padding: 15,
     fontSize: 12,
     color: '#364D39',
-  },
-  topContainer: {
-    zIndex: 1,
-    width: '100%',
-    height: '15%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-
-    paddingHorizontal: 30,
   },
   menuLogo: {
     height: '50%',
