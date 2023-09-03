@@ -365,8 +365,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	image: {
-		width: "90%",
-		height: "90%",
+		width: "95%",
+		height: "95%",
 	},
 	bottomNavigationView: {
 		backgroundColor: "#fff",

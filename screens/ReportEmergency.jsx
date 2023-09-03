@@ -48,7 +48,6 @@ const ReportEmergency = ({ navigation }) => {
 			getAllRooms(token)
 		} else {
 			alert("Invalid token, please re-login to continue.");
-			navigation.navigate('Login')
 		}
 	}
 
