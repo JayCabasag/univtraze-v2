@@ -12,7 +12,7 @@ function userReducer(user, action) {
     case 'update-type': {
       return {
         ...user,
-        type: action.payload
+        type: action.payload,
       };
     }
     default: {
@@ -39,9 +39,7 @@ export function UserProvider({ children }) {
   const [user, dispatch] = useReducer(userReducer, initialUser);
   return (
     <UserContext.Provider value={user}>
-      <UserDispatchContext.Provider value={dispatch}>
-        {children}
-      </UserDispatchContext.Provider>
+      <UserDispatchContext.Provider value={dispatch}>{children}</UserDispatchContext.Provider>
     </UserContext.Provider>
   );
 }

@@ -1,20 +1,20 @@
-import axios from "axios";
-import { SERVER } from "./configs";
+import axios from 'axios';
+import { SERVER } from './configs';
 
 export const genericGetRequest = async (url, token = null) => {
-    try {
-      const headers = {};
-  
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-  
-      const response = await axios.get(`${SERVER}${url}`, { headers });
-      return response.data;
-    } catch (error) {
-      throw error;
+  try {
+    const headers = {};
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
-}
+
+    const response = await axios.get(`${SERVER}${url}`, { headers });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 /*
 const apiUrl = 'https://api.example.com/data';

@@ -1,19 +1,19 @@
-import axios from "axios";
-import { SERVER } from "./configs";
+import axios from 'axios';
+import { SERVER } from './configs';
 
 export const genericPostRequest = async (url, data, token = null) => {
-    try {
-      const headers = {};
-  
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }  
-      const response = await axios.post(`${SERVER}${url}`, data, { headers });
-      return response.data;
-    } catch (error) {
-      throw error;
+  try {
+    const headers = {};
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
-}
+    const response = await axios.post(`${SERVER}${url}`, data, { headers });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 /*
 const apiUrl = 'https://api.example.com/data';

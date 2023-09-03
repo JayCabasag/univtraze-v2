@@ -1,21 +1,21 @@
-import axios from "axios";
+import axios from 'axios';
 
 export const genericDeleteRequest = async (url, token = null) => {
-    try {
-      const headers = {};
-  
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-  
-      const response = await axios.delete(`${SERVER}${url}`, { headers });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  };
+  try {
+    const headers = {};
 
-  /*
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await axios.delete(`${SERVER}${url}`, { headers });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/*
 const apiUrl = 'https://api.example.com/data/123';
 const authToken = 'your-auth-token';
 
