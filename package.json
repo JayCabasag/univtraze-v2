@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "format": "npx prettier --write \"**/*.{js,jsx}\""
   },
   "dependencies": {
     "@eva-design/eva": "^2.2.0",
