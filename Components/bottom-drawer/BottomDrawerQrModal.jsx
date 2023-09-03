@@ -8,7 +8,7 @@ export default function BottomDrawerQrModal({ openQrModal, setOpenQrModal, paylo
   return (
     <Modal
       animationType="fade"
-      transparent={true}
+      transparent
       visible={openQrModal}
       onRequestClose={() => {
         setOpenQrModal((prev) => !prev);
