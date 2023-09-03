@@ -7,8 +7,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpUserType from './screens/SignUpUserType';
 import QrScanner from './screens/QrScanner';
-import ReportCovidCase from './screens/ReportCovidCase'
-import ReportEmergency from './screens/ReportEmergency'
+import ReportCovidCase from './screens/report-covid-case/ReportCovidCase';
+import ReportEmergency from './screens/report-emergency/ReportEmergency';
 import DailyAsessment from './screens/DailyAsessment';
 import RoomVisited from './screens/RoomVisited';
 import TemperatureHistory from './screens/TemperatureHistory';

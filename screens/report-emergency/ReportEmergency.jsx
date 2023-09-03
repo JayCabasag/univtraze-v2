@@ -16,8 +16,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
-import { PRODUCTION_SERVER } from "../services/configs";
-import { DEFAULT_ERROR_MESSAGE, MedicalConditions } from "../utils/app_constants";
+import { PRODUCTION_SERVER } from "../../services/configs";
+import { DEFAULT_ERROR_MESSAGE, MedicalConditions } from "../../utils/app_constants";
 import { Select, SelectItem } from '@ui-kitten/components'
 
 const ReportEmergency = ({ navigation }) => {
@@ -35,10 +35,6 @@ const ReportEmergency = ({ navigation }) => {
 	//Loading modal Variables
 	const [showLoadingModal, setShowLoadingModal] = useState(false)
 	const [loadingModalMessage, setLoadingModalMessage] = useState('Please wait...')
-
-	useEffect(() => {
-		getValueFor("x-token");
-	}, []);
 
 	async function getValueFor(key) {
 		let token = await SecureStore.getItemAsync(key);
@@ -265,9 +261,6 @@ const ReportEmergency = ({ navigation }) => {
 						</View>
 					</View>
 				</Modal>
-
-
-				{/* Notification View */}
 				<View style={styles.topContainer}>
 					<View style={styles.backIcon}>
 						<TouchableWithoutFeedback onPress={() => { navigation.goBack() }}>
@@ -279,8 +272,6 @@ const ReportEmergency = ({ navigation }) => {
 						</TouchableWithoutFeedback>
 					</View>
 				</View>
-				{/*End  Notification View */}
-				{/* Body Container */}
 				<Text
 					style={{
 						height: "auto",
@@ -291,8 +282,14 @@ const ReportEmergency = ({ navigation }) => {
 						padding: 10,
 					}}
 				>
-					Emergency {"\n"}Report
+					Emergency Report
 				</Text>
+				<View style={{ paddingVertical: 5, paddingHorizontal: 10, marginBottom: 20, marginHorizontal: 40 }}>
+						<Text style={styles.bodyText}>Know someone a victim of communicable disease?</Text>
+						<Text style={styles.bodyText}>
+						 help them by reporting on their behalf.
+						</Text>
+					</View>
 				<ScrollView showsVerticalScrollIndicator={false}>
 					<View style={styles.bodyContainer}>
 						<View style={styles.formContainer}>

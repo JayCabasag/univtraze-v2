@@ -17,7 +17,7 @@ import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
-import { PRODUCTION_SERVER } from "../services/configs";
+import { PRODUCTION_SERVER } from "../../services/configs";
 
 const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 	// Notifications Variables
@@ -38,14 +38,6 @@ const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 
 	const [showLoadingModal, setShowLoadingModal] = useState(false)
 	const [loadingMessage, setLoadingMessage] = useState("Please wait...")
-
-	//Error Handler variables
-	const [error, setError] = useState(false)
-	const [errorMessage, setErrorMessage] = useState("")
-
-	useEffect(() => {
-		getValueFor("x-token");
-	}, []);
 
 	async function getValueFor(key) {
 		let result = await SecureStore.getItemAsync(key);
@@ -169,8 +161,6 @@ const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 						</View>
 					</View>
 				</Modal>
-
-				{/* Notification View */}
 				<View style={styles.topContainer}>
 					<View style={styles.backIcon}>
 						<TouchableWithoutFeedback onPress={() => { navigation.goBack() }}>
@@ -181,18 +171,7 @@ const ReportCovidCase = ({ navigation, route: { params: { id, type } } }) => {
 							></ImageBackground>
 						</TouchableWithoutFeedback>
 					</View>
-
-
-					{/*bottom navigation for user settings  */}
-
-					{/*end of bottom navigation for user settings  */}
-
-					{/* start of botton sheet for notification */}
-
-
-					{/*end of botton sheet for notification */}
 				</View>
-				{/*End  Notification View */}
 				<View style={styles.bodyContainer}>
 					<View style={{ paddingVertical: 10 }}>
 						<Text style={styles.reportCovidText}>
