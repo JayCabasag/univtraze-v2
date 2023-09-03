@@ -4,9 +4,6 @@ import {
   View,
   StyleSheet,
   Button,
-  Modal,
-  Pressable,
-  Image,
   StatusBar,
   TouchableWithoutFeedback,
   ImageBackground,
@@ -44,10 +41,10 @@ export default function QrScanner({ navigation, route }) {
 
   const handleGetUserTemperature = async () => {
     const currentUserId = route.params.id;
-    const token = route.params.token;
+    const { token } = route.params;
 
-    let initialDateToday = new Date();
-    let finalDateToday = moment(initialDateToday).format('YYYY-MM-DD');
+    const initialDateToday = new Date();
+    const finalDateToday = moment(initialDateToday).format('YYYY-MM-DD');
 
     const config = {
       headers: { Authorization: `Bearer ${token}` },
@@ -61,7 +58,7 @@ export default function QrScanner({ navigation, route }) {
     await axios
       .post(`${PRODUCTION_SERVER}/rooms/userTodaysTemperature`, data, config)
       .then((response) => {
-        const success = response.data.success;
+        const { success } = response.data;
 
         if (success === 0 && response.data.data === 'Not set') {
           return setTemp('Not set');
@@ -72,7 +69,7 @@ export default function QrScanner({ navigation, route }) {
         }
 
         if (success === 1) {
-          //setTemp(response.data.data.temperature)
+          // setTemp(response.data.data.temperature)
           if (response.data.data === undefined) {
             return setTemp('Not set');
           }
@@ -117,7 +114,7 @@ export default function QrScanner({ navigation, route }) {
     return (
       <View style={styles.container}>
         <Text style={{ margin: 10 }}>No access to camera</Text>
-        <Button title={'Allow Camera'} onPress={() => askForCameraPermission()} />
+        <Button title="Allow Camera" onPress={() => askForCameraPermission()} />
       </View>
     );
   }
@@ -131,9 +128,9 @@ export default function QrScanner({ navigation, route }) {
     setModalVisible(!modalVisible);
     const currentUserType = route.params.type;
     const currentUserId = route.params.id;
-    const token = route.params.token;
+    const { token } = route.params;
 
-    //Axios data starts here to add the room visited
+    // Axios data starts here to add the room visited
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
@@ -141,11 +138,11 @@ export default function QrScanner({ navigation, route }) {
     const data = {
       user_id: currentUserId,
       room_id: currentRoomId,
-      temp: temp,
+      temp,
     };
 
     await axios.post(`${PRODUCTION_SERVER}/rooms/addVisitedRoom`, data, config).then((response) => {
-      const success = response.data.success;
+      const { success } = response.data;
 
       if (success === 0) {
         return alert('Please try again');
@@ -154,12 +151,12 @@ export default function QrScanner({ navigation, route }) {
       return navigation.goBack();
     });
 
-    //Axios data here to add a notification
+    // Axios data here to add a notification
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar animated={true} backgroundColor="#E1F5E4" barStyle="dark-content" />
+      <StatusBar animated backgroundColor="#E1F5E4" barStyle="dark-content" />
       <View style={styles.topContainer}>
         <View style={styles.backIcon}>
           <TouchableWithoutFeedback
@@ -168,10 +165,10 @@ export default function QrScanner({ navigation, route }) {
             }}
           >
             <ImageBackground
-              source={require('../assets/back-icon.png')}
+              source={require('../../assets/back-icon.png')}
               resizeMode="contain"
               style={styles.image}
-            ></ImageBackground>
+            />
           </TouchableWithoutFeedback>
         </View>
       </View>
@@ -190,7 +187,7 @@ export default function QrScanner({ navigation, route }) {
         >
           <Text style={{ fontSize: 15, paddingTop: 10 }}>Body temperature:</Text>
           <Text style={{ fontSize: 35, paddingBottom: 10, textAlign: 'center', color: '#4d7861' }}>
-            {temp === '' || temp === 'Not set' ? 'Not set' : temp + '°C'}
+            {temp === '' || temp === 'Not set' ? 'Not set' : `${temp}°C`}
           </Text>
         </View>
       </View>

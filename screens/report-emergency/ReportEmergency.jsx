@@ -15,12 +15,14 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Select, SelectItem } from '@ui-kitten/components';
 import { PRODUCTION_SERVER } from '../../services/configs';
 import { DEFAULT_ERROR_MESSAGE, MedicalConditions } from '../../utils/app_constants';
-import { Select, SelectItem } from '@ui-kitten/components';
+import loadingIcon from '../../assets/loading_icon.gif';
+import backIcon from '../../assets/back-icon.png';
 
-const ReportEmergency = ({ navigation }) => {
+function ReportEmergency({ navigation }) {
   const [selectedIndex, setSelectedIndex] = useState([]);
   const selectedMedicalConditionsValue = selectedIndex
     .map((index) => MedicalConditions[index - 1])
@@ -33,20 +35,9 @@ const ReportEmergency = ({ navigation }) => {
   const [token, setToken] = useState('');
   const [currentUserId, setCurrentUserId] = useState(null);
 
-  //Loading modal Variables
+  // Loading modal Variables
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [loadingModalMessage, setLoadingModalMessage] = useState('Please wait...');
-
-  async function getValueFor(key) {
-    let token = await SecureStore.getItemAsync(key);
-    if (token) {
-      setToken(token);
-      decodeJwt(token);
-      getAllRooms(token);
-    } else {
-      alert('Invalid token, please re-login to continue.');
-    }
-  }
 
   const getAllRooms = async (token) => {
     const config = {
@@ -55,7 +46,7 @@ const ReportEmergency = ({ navigation }) => {
     await axios
       .get(`${PRODUCTION_SERVER}/rooms/allRooms`, config)
       .then((response) => {
-        const success = response.data.success;
+        const { success } = response.data;
         if (success === 0) {
           return setAllRooms([]);
         }
@@ -70,13 +61,12 @@ const ReportEmergency = ({ navigation }) => {
   };
 
   const decodeJwt = (currentToken) => {
-    var decodedToken = jwtDecode(currentToken);
+    const decodedToken = jwtDecode(currentToken);
 
     setCurrentUserId(decodedToken.result.id);
 
     if (decodedToken.result.type === null) {
       navigation.navigate('SignUpUserType');
-      return;
     }
   };
 
@@ -89,7 +79,7 @@ const ReportEmergency = ({ navigation }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  //End of user input variables
+  // End of user input variables
 
   const submitEmergencyReport = async () => {
     const currentPatientName = patientName;
@@ -177,7 +167,7 @@ const ReportEmergency = ({ navigation }) => {
     setShowLoadingModal(true);
     setLoadingModalMessage('Please wait ...');
 
-    var data = {
+    const data = {
       reported_by: currentUserId,
       patient_name: currentPatientName,
       medical_condition: currentMedicalCondition,
@@ -194,7 +184,7 @@ const ReportEmergency = ({ navigation }) => {
 
     await axios
       .post(`${PRODUCTION_SERVER}/covid_cases/addEmergencyReport`, data, {
-        headers: headers,
+        headers,
       })
       .then((response) => {
         if (response.data.success === 0 && response.data.message === 'Invalid token') {
@@ -244,11 +234,11 @@ const ReportEmergency = ({ navigation }) => {
 
   return (
     <SafeAreaView>
-      <StatusBar animated={true} backgroundColor="#E1F5E4" />
+      <StatusBar animated backgroundColor="#E1F5E4" />
       <View style={styles.container}>
         <Modal
           animationType="fade"
-          transparent={true}
+          transparent
           visible={showLoadingModal}
           onRequestClose={() => {
             setShowLoadingModal(!showLoadingModal);
@@ -257,7 +247,7 @@ const ReportEmergency = ({ navigation }) => {
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Image
-                source={require('../assets/loading_icon.gif')}
+                source={loadingIcon}
                 resizeMode="contain"
                 style={{ width: 100, height: 100 }}
               />
@@ -272,11 +262,7 @@ const ReportEmergency = ({ navigation }) => {
                 navigation.goBack();
               }}
             >
-              <ImageBackground
-                source={require('../assets/back-icon.png')}
-                resizeMode="contain"
-                style={styles.image}
-              ></ImageBackground>
+              <ImageBackground source={backIcon} resizeMode="contain" style={styles.image} />
             </TouchableWithoutFeedback>
           </View>
         </View>
@@ -319,20 +305,20 @@ const ReportEmergency = ({ navigation }) => {
               <Text style={{ marginTop: 20 }}>Medical condition</Text>
               <Select
                 value={selectedMedicalConditionsValue}
-                multiSelect={true}
+                multiSelect
                 status="success"
                 style={styles.medicalConditionDropdown}
                 selectedIndex={selectedIndex}
                 onSelect={(index) => setSelectedIndex(index)}
               >
-                {MedicalConditions.map((value, index) => {
-                  return <SelectItem title={value} key={index} />;
-                })}
+                {MedicalConditions.map((value, index) => (
+                  <SelectItem title={value} key={index} />
+                ))}
               </Select>
               <Text style={{ marginTop: 20 }}>Description</Text>
 
               <TextInput
-                multiline={true}
+                multiline
                 numberOfLines={4}
                 onChangeText={(textArea) => onChangeTextArea(textArea)}
                 value={textArea}
@@ -348,9 +334,9 @@ const ReportEmergency = ({ navigation }) => {
                 selectedIndex={selectedRoomIndex}
                 onSelect={(index) => setSelectedRoomIndex(index)}
               >
-                {allRooms.map((value, index) => {
-                  return <SelectItem title={value.room_number} key={index} />;
-                })}
+                {allRooms.map((value, index) => (
+                  <SelectItem title={value.room_number} key={index} />
+                ))}
               </Select>
               {success ? (
                 <Text
@@ -404,11 +390,11 @@ const ReportEmergency = ({ navigation }) => {
             </View>
           </View>
         </ScrollView>
-        {/*End of Body Container */}
+        {/* End of Body Container */}
       </View>
     </SafeAreaView>
   );
-};
+}
 export default ReportEmergency;
 
 const styles = StyleSheet.create({

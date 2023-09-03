@@ -12,47 +12,38 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { RadioButton } from 'react-native-paper';
-import React, { useState, useEffect } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-import { PRODUCTION_SERVER } from '../../services/configs';
+import loadingIcon from '../../assets/loading_icon.gif';
+import backIcon from '../../assets/back-icon.png';
 
-const ReportCovidCase = ({
+function ReportCovidCase({
   navigation,
   route: {
     params: { id, type },
   },
-}) => {
+}) {
   // Notifications Variables
 
-  //end Notifications Variables
+  // end Notifications Variables
   const [isChecked, setIsChecked] = useState('');
   const [token, setToken] = useState('');
 
-  //Variables for data
+  // Variables for data
   const [proofDoc, setProofDoc] = useState(null);
   const [selectedDisease, setSelectedDisease] = useState('');
   const [otherDiseaseName, setOtherDiseaseName] = useState('');
   const [base64ProofDoc, setBase64ProofDoc] = useState('');
 
-  //Variables for loading
+  // Variables for loading
 
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Please wait...');
 
-  async function getValueFor(key) {
-    let result = await SecureStore.getItemAsync(key);
-    if (result) {
-      setToken(result);
-    } else {
-      alert('No values stored under that jwt-token.');
-    }
-  }
-
   const pickDocumentForProofDoc = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       base64: true,
@@ -63,7 +54,7 @@ const ReportCovidCase = ({
       setProofDoc(result);
     }
 
-    const convertedBase64Img = 'data:image/jpeg;base64,' + result.base64;
+    const convertedBase64Img = `data:image/jpeg;base64,${result.base64}`;
     setBase64ProofDoc(convertedBase64Img);
   };
 
@@ -88,18 +79,18 @@ const ReportCovidCase = ({
   };
 
   const handleUploadData = async (token, base64ProofDoc, selectedDisease) => {
-    var proofDocUrl = '';
+    let proofDocUrl = '';
     setShowLoadingModal(true);
     setLoadingMessage('Please wait while uploading your document.');
     await axios
       .post(`${PRODUCTION_SERVER}/files/uploadUserBase64Image`, {
         image: base64ProofDoc,
       })
-      .then(function (response) {
+      .then((response) => {
         proofDocUrl = response.data.results.url;
         setLoadingMessage('Uploading profile document completed...');
       })
-      .catch(function (error) {
+      .catch((error) => {
         alert('Error occured while uploading your profile photo');
       });
 
@@ -117,18 +108,18 @@ const ReportCovidCase = ({
 
     const data = {
       user_id: id,
-      type: type,
-      disease_name: disease_name,
+      type,
+      disease_name,
       document_proof_image: proofDocUrl,
     };
 
     await axios
       .post(`${PRODUCTION_SERVER}/covid_cases/addCommunicableDiseaseCase`, data, config)
       .then((response) => {
-        const success = response.data.success;
+        const { success } = response.data;
 
         if (success === 0) {
-          return alert('Please try again later : ' + response.data.message);
+          return alert(`Please try again later : ${response.data.message}`);
         }
         setShowLoadingModal(false);
         setLoadingMessage('Submitted Successfully.');
@@ -140,11 +131,11 @@ const ReportCovidCase = ({
 
   return (
     <SafeAreaView>
-      <StatusBar animated={true} backgroundColor="#E1F5E4" />
+      <StatusBar animated backgroundColor="#E1F5E4" />
       <View style={styles.container}>
         <Modal
           animationType="slide"
-          transparent={true}
+          transparent
           visible={showLoadingModal}
           onRequestClose={() => {
             setShowLoadingModal(!showLoadingModal);
@@ -153,7 +144,7 @@ const ReportCovidCase = ({
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Image
-                source={require('../assets/loading_icon.gif')}
+                source={loadingIcon}
                 resizeMode="contain"
                 style={{ width: 100, height: 100 }}
               />
@@ -168,11 +159,7 @@ const ReportCovidCase = ({
                 navigation.goBack();
               }}
             >
-              <ImageBackground
-                source={require('../assets/back-icon.png')}
-                resizeMode="contain"
-                style={styles.image}
-              ></ImageBackground>
+              <ImageBackground source={backIcon} resizeMode="contain" style={styles.image} />
             </TouchableWithoutFeedback>
           </View>
         </View>
@@ -287,7 +274,6 @@ const ReportCovidCase = ({
               <View
                 style={{
                   marginTop: 'auto',
-                  marginBottom: 10,
                   width: '100%',
                   height: 'auto',
                   alignSelf: 'center',
@@ -353,7 +339,7 @@ const ReportCovidCase = ({
       </View>
     </SafeAreaView>
   );
-};
+}
 export default ReportCovidCase;
 
 const styles = StyleSheet.create({

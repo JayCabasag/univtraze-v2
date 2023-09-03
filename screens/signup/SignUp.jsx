@@ -6,21 +6,20 @@ import {
   TouchableOpacity,
   Text,
   StatusBar,
+  Alert,
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Loading from '../../Components/loading/Loading';
-import Succes from '../../Components/success/Succes';
-import TypeSelect from '../../Components/type/TypeSelect';
+import { useFormik } from 'formik';
+import Loading from '../../components/loading/Loading';
+import Succes from '../../components/success/Succes';
+import TypeSelect from '../../components/type/TypeSelect';
 import { useUser, useUserDispatch } from '../../contexts/user/UserContext';
 import { genericPostRequest } from '../../services/genericPostRequest';
-import { useFormik } from 'formik';
 import { SignUpSchema } from './schemas/SignUpSchema';
-import { UserTypes } from '../../utils/app_constants';
-import { Alert } from 'react-native';
 
-const SignUp = ({ navigation, route }) => {
+function SignUp({ navigation, route }) {
   const loadingMessage = 'Registering please wait...';
   const userDispatch = useUserDispatch();
   const user = useUser();
@@ -37,24 +36,23 @@ const SignUp = ({ navigation, route }) => {
     },
     validationSchema: SignUpSchema,
     onSubmit: async (values) => {
-      const data = {
+      const payload = {
         email: values.email,
         password: values.password,
         type: values.type,
       };
       setShowLoadingModal(true);
-      await genericPostRequest('/auth/signup', data)
+      await genericPostRequest('/auth/signup', payload)
         .then((response) => {
-          const data = response;
-          const user = data['user'];
+          const { user: userResponse } = response;
           userDispatch({
             type: 'update',
             payload: {
-              id: user.sub,
-              type: user.type,
-              email: user.email,
-              token: data['access_token'],
-              verified: user.verified,
+              id: userResponse.sub,
+              type: userResponse.type,
+              email: userResponse.email,
+              token: response.access_token,
+              verified: userResponse.verified,
               status: 'authenticated',
             },
           });
@@ -107,7 +105,7 @@ const SignUp = ({ navigation, route }) => {
         message={loadingMessage}
       />
       <Succes open={showSuccessModal} onContinue={() => redirect(user.verified)} />
-      <StatusBar animated={true} backgroundColor="#E1F5E4" barStyle="dark-content" />
+      <StatusBar animated backgroundColor="#E1F5E4" barStyle="dark-content" />
       <KeyboardAvoidingView style={styles.container} behavior="height">
         <View style={styles.inputContainer}>
           <Text style={styles.header}>Sign Up</Text>
@@ -182,7 +180,7 @@ const SignUp = ({ navigation, route }) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
+}
 
 export default SignUp;
 
