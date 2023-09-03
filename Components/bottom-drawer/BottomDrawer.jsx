@@ -1,35 +1,35 @@
-import { StyleSheet, Text, View, Pressable, Image, Modal, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { BottomSheet } from 'react-native-btr';
 import React, { useState } from 'react';
 import { useToast } from 'react-native-toast-notifications';
 import { useUser } from '../../contexts/user/UserContext';
 import { DEFAULT_PROFILE_PHOTO } from '../../utils/app_constants';
 import BottomDrawerQrModal from './BottomDrawerQrModal';
+import menuHomeIcon from '../../assets/menuhome_icon.png';
+import updateInfoIcon from '../../assets/updateinfo_icon.png';
+import temperatureHistorIcon from '../../assets/temp_history.png';
+import accountSettingIcon from '../../assets/accountsetting_icon.png';
+import roomEnterIcon from '../../assets/room_enter.png';
+import logoutIcon from '../../assets/logout_icon.png';
 
-const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) => {
+export default function BottomDrawer({ open, toggleBottomNavigationView, props, navigation }) {
   const [openQrModal, setOpenQrModal] = useState(false);
   const [qrModalPayload, setQrModalPayload] = useState({});
   const user = useUser();
   const { id, type } = user;
-  const fullname = `${props?.['first_name'] ?? ''} ${props?.['last_name'] ?? ''}`;
+  const fullname = `${props?.first_name ?? ''} ${props?.last_name ?? ''}`;
 
   const toast = useToast();
 
   const viewQrCode = () => {
     if (!id) return;
     if (!type) return;
-    let rawData = { id, type, name: fullname };
+    const rawData = { id, type, name: fullname };
     setQrModalPayload(rawData);
     setOpenQrModal(true);
-    return;
   };
 
-  async function clear(key, value) {
-    await SecureStore.deleteItemAsync(key, value);
-  }
-
   const logout = async () => {
-    await clear('x-token');
     toast.show('Logged out successfully...', {
       type: 'normal',
       placement: 'bottom',
@@ -63,7 +63,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
               }}
             >
               <Image
-                source={{ uri: props?.['profile_photo'] ?? DEFAULT_PROFILE_PHOTO }}
+                source={{ uri: props?.profile_photo ?? DEFAULT_PROFILE_PHOTO }}
                 resizeMode="cover"
                 style={{
                   width: 50,
@@ -113,7 +113,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
               }}
             >
               <Image
-                source={require('../../assets/menuhome_icon.png')}
+                source={menuHomeIcon}
                 resizeMode="contain"
                 style={{
                   width: 15,
@@ -128,7 +128,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
               onPress={() => {
                 toggleBottomNavigationView();
 
-                navigation.navigate('SignUpVaccination', { type: type });
+                navigation.navigate('SignUpVaccination', { type });
               }}
               style={{
                 width: '100%',
@@ -139,7 +139,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
               }}
             >
               <Image
-                source={require('../../assets/updateinfo_icon.png')}
+                source={updateInfoIcon}
                 resizeMode="contain"
                 style={{
                   width: 15,
@@ -165,7 +165,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
               }}
             >
               <Image
-                source={require('../../assets/temp_history.png')}
+                source={temperatureHistorIcon}
                 resizeMode="contain"
                 style={{
                   width: 17,
@@ -191,7 +191,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
               }}
             >
               <Image
-                source={require('../../assets/accountsetting_icon.png')}
+                source={accountSettingIcon}
                 resizeMode="contain"
                 style={{
                   width: 15,
@@ -217,7 +217,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
               }}
             >
               <Image
-                source={require('../../assets/room_enter.png')}
+                source={roomEnterIcon}
                 resizeMode="contain"
                 style={{
                   width: 17,
@@ -243,7 +243,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
                 style={{ flexDirection: 'row', width: '100%' }}
               >
                 <Image
-                  source={require('../../assets/logout_icon.png')}
+                  source={logoutIcon}
                   resizeMode="contain"
                   style={{
                     width: 15,
@@ -260,9 +260,7 @@ const BottomDrawer = ({ open, toggleBottomNavigationView, props, navigation }) =
       </View>
     </BottomSheet>
   );
-};
-
-export default BottomDrawer;
+}
 
 const styles = StyleSheet.create({
   container: {
