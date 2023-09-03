@@ -1,9 +1,6 @@
-import { View } from 'react-native';
 import React from 'react';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { UserTypes } from '../../utils/app_constants';
-import { StyleSheet } from 'react-native';
-import { TouchableOpacity } from 'react-native';
-import { Text } from 'react-native';
 
 export default function TypeSelect({ type, onSelectType }) {
   return (

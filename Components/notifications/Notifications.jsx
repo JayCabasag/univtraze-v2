@@ -2,19 +2,20 @@ import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import { BottomSheet } from 'react-native-btr';
 import React from 'react';
 import moment from 'moment';
+import dailyAssessementIcon from '../../assets/dailyAssess_icon.png';
 
-const Notifications = ({
+export default function Notifications({
   notifVisible,
   toggleNotifNavigationView,
-  props: { userId, token, notificationLists },
-}) => {
+  props: { notificationLists },
+}) {
   return (
     <BottomSheet
       visible={notifVisible}
       onBackButtonPress={toggleNotifNavigationView}
       onBackdropPress={toggleNotifNavigationView}
     >
-      {/*Bottom Sheet inner View*/}
+      {/* Bottom Sheet inner View */}
       <View style={styles.bottomNavigationView}>
         <View style={{ width: '100%', height: '100%' }}>
           <View style={styles.notificationTextContainer}>
@@ -33,61 +34,57 @@ const Notifications = ({
             {/* Daily self assessment   notification */}
 
             {notificationLists && notificationLists
-              ? notificationLists.map((notification) => {
-                  return (
-                    <View
+              ? notificationLists.map((notification) => (
+                  <View
+                    style={{
+                      width: '100%',
+                      height: 54,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginBottom: 5,
+                      alignContent: 'center',
+                    }}
+                    key={notification.id}
+                  >
+                    <Image
+                      source={dailyAssessementIcon}
+                      resizeMode="contain"
                       style={{
-                        width: '100%',
-                        height: 54,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginBottom: 5,
-                        alignContent: 'center',
+                        width: 32,
+                        height: 32,
                       }}
-                      key={notification.id}
-                    >
-                      <Image
-                        source={require('../../assets/dailyAssess_icon.png')}
-                        resizeMode="contain"
+                    />
+                    <View style={{ paddingLeft: 15 }}>
+                      <Text
+                        numberOfLines={1}
                         style={{
-                          width: 32,
-                          height: 32,
+                          color: 'black',
+                          fontSize: 16,
+                          fontWeight: '700',
+                          width: 245,
                         }}
-                      />
-                      <View style={{ paddingLeft: 15 }}>
-                        <Text
-                          numberOfLines={1}
-                          style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontWeight: '700',
-                            width: 245,
-                          }}
-                        >
-                          {notification.notification_title}
-                        </Text>
-                        <Text
-                          style={{
-                            color: '#364D39',
-                            fontSize: 12,
-                            fontWeight: '900',
-                          }}
-                        >
-                          {moment(notification.createdAt).fromNow()}
-                        </Text>
-                      </View>
+                      >
+                        {notification.notification_title}
+                      </Text>
+                      <Text
+                        style={{
+                          color: '#364D39',
+                          fontSize: 12,
+                          fontWeight: '900',
+                        }}
+                      >
+                        {moment(notification.createdAt).fromNow()}
+                      </Text>
                     </View>
-                  );
-                })
+                  </View>
+                ))
               : null}
           </ScrollView>
         </View>
       </View>
     </BottomSheet>
   );
-};
-
-export default Notifications;
+}
 
 const styles = StyleSheet.create({
   container: {

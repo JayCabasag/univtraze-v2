@@ -1,11 +1,10 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { View, Text, Modal, StyleSheet } from 'react-native';
+import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function Success({ open, onContinue }) {
   return (
-    <Modal animationType="fade" transparent={true} visible={open} onRequestClose={onContinue}>
+    <Modal animationType="fade" transparent visible={open} onRequestClose={onContinue}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.signUpHeader}> Sign Up Successful</Text>

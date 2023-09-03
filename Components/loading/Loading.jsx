@@ -1,16 +1,13 @@
 import React from 'react';
 import { Image, View, Text, Modal, StyleSheet } from 'react-native';
+import loadingIcon from '../../assets/loading_icon.gif';
 
 export default function Loading({ open, onClose, message }) {
   return (
-    <Modal animationType="fade" transparent={true} visible={open} onRequestClose={onClose}>
+    <Modal animationType="fade" transparent visible={open} onRequestClose={onClose}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Image
-            source={require('../../assets/loading_icon.gif')}
-            resizeMode="contain"
-            style={{ width: 100, height: 100 }}
-          />
+          <Image source={loadingIcon} resizeMode="contain" style={{ width: 100, height: 100 }} />
           <Text style={styles.modalText}>{message}</Text>
         </View>
       </View>
