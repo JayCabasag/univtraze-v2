@@ -28,12 +28,14 @@ const Home = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar animated={true} backgroundColor="#28CD41" />
       <ImageBackground source={image} resizeMode="cover" style={styles.univTrazeLogo}>
-        <View style={{ width: '80%', height: 45, marginTop: '35%' }}>
+        <View style={styles.logoWrapper}>
           <Image style={styles.image} source={uniTrazeLogo} resizeMode="contain" />
         </View>
 
         <View style={{ paddingTop: 10, marginLeft: 30 }}>
+          {' '}
           <Text style={{ color: '#ffff', fontSize: 16 }}>
+            {' '}
             University contactt tracing app {'\n'}makes tracing easier
           </Text>
         </View>
@@ -44,6 +46,7 @@ const Home = ({ navigation }) => {
             marginBottom: 40,
             justifyContent: 'center',
             alignItems: 'center',
+            paddingHorizontal: 15,
           }}
         >
           <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.button}>
@@ -81,12 +84,20 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  logoWrapper: {
+    width: '100%',
+    height: 45,
+    marginTop: '35%',
+    display: 'flex',
+    borderWidth: 1,
+    justifyContent: 'flex-start',
+  },
   button: {
     marginBottom: 10,
     backgroundColor: '#28CD41',
     padding: 10,
     borderRadius: 10,
-    width: 340,
+    width: '100%',
     marginTop: 5,
     paddingVertical: 18,
     shadowColor: '#000',
@@ -119,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     padding: 10,
     borderRadius: 10,
-    width: 340,
+    width: '100%',
     marginTop: 5,
     paddingVertical: 18,
     shadowColor: '#000',
