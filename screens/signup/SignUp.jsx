@@ -13,7 +13,7 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFormik } from 'formik';
 import Loading from '../../components/loading/Loading';
-import Succes from '../../components/success/Succes';
+import Succes from '../../components/success/Success';
 import TypeSelect from '../../components/type/TypeSelect';
 import { useUser, useUserDispatch } from '../../contexts/user/UserContext';
 import { genericPostRequest } from '../../services/genericPostRequest';
